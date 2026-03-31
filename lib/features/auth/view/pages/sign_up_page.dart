@@ -6,6 +6,6 @@ class SignUpPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Sign_Up_Body();
+    return SignUpBody();
   }
 }

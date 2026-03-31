@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class Custom_Navigaton_Text extends StatelessWidget {
-  Custom_Navigaton_Text({required this.direction});
+class CustomNavigatonText extends StatelessWidget {
+  const CustomNavigatonText({super.key, required this.direction});
 
   final String direction;
 
   @override
   Widget build(BuildContext context) {
-    if (direction == "sign in")
+    if (direction == "sign in") {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -36,7 +36,7 @@ class Custom_Navigaton_Text extends StatelessWidget {
           ),
         ],
       );
-    else {
+    } else {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

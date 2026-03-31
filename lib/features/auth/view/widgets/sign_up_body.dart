@@ -3,8 +3,8 @@ import 'package:dealura/features/auth/view/widgets/custom_auth_button.dart';
 import 'package:dealura/features/auth/view/widgets/custom_navigation_text.dart';
 import 'package:flutter/material.dart';
 
-class Sign_Up_Body extends StatelessWidget {
-  const Sign_Up_Body({super.key});
+class SignUpBody extends StatelessWidget {
+  const SignUpBody({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -47,22 +47,22 @@ class Sign_Up_Body extends StatelessWidget {
                       fontWeight: FontWeight.w400,
                     ),
                   ),
-                  Custom_Textfield(
+                  CustomTextField(
                     hintText: 'Choose a username',
                     legend: 'Username',
                   ),
-                  Custom_Textfield(
+                  CustomTextField(
                     hintText: 'Enter your email',
                     legend: 'Email',
                   ),
-                  Custom_Textfield(
+                  CustomTextField(
                     hintText: 'Create a password',
                     legend: 'Password',
                   ),
 
-                  Custom_Auth_Button(authText: "Sign up"),
+                  CustomAuthButton(authText: "Sign up"),
                   SizedBox(height: 10),
-                  Custom_Navigaton_Text(direction: "sign in"),
+                  CustomNavigatonText(direction: "sign in"),
                 ],
               ),
             ),

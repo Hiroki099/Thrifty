@@ -1,3 +1,4 @@
+import 'package:dealura/features/auth/view/widgets/sign_up_body.dart';
 import 'package:flutter/material.dart';
 
 class SignUpPage extends StatelessWidget {
@@ -5,10 +6,6 @@ class SignUpPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Text('Sign Up Page'),
-      ),
-    );
+    return Sign_Up_Body();
   }
 }

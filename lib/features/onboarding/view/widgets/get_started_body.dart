@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class GetStartBody extends StatelessWidget {
   const GetStartBody({super.key});
@@ -61,21 +62,26 @@ class GetStartBody extends StatelessWidget {
                   "A simple place to sell,\n bid and donate items with ease.\n Discover treasures ,support others \n and connect\n through a trusted community.",
                 ),
                 SizedBox(height: 40),
-                Container(
-                  height: 70,
-                  width: 350,
-                  child: Center(
-                    child: Text(
-                      "Get Started",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontFamily: "DM Serif Display",
+                GestureDetector(
+                  onTap: () {
+                    GoRouter.of(context).push('/sign-up');
+                  },
+                  child: Container(
+                    height: 70,
+                    width: 350,
+                    child: Center(
+                      child: Text(
+                        "Get Started",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontFamily: "DM Serif Display",
+                        ),
                       ),
                     ),
-                  ),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(19),
-                    color: Color(0xFFE7A072),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(19),
+                      color: Color(0xFFE7A072),
+                    ),
                   ),
                 ),
               ],

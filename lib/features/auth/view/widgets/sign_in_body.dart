@@ -1,10 +1,10 @@
 import 'package:dealura/features/auth/view/widgets/custom_auth_button.dart';
 import 'package:dealura/features/auth/view/widgets/custom_navigation_text.dart';
-import 'package:dealura/features/auth/view/widgets/sign_up_form.dart';
+import 'package:dealura/features/auth/view/widgets/sign_in_form.dart';
 import 'package:flutter/material.dart';
 
-class SignUpBody extends StatelessWidget {
-  const SignUpBody({super.key});
+class SignInBody extends StatelessWidget {
+  const SignInBody({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -12,11 +12,11 @@ class SignUpBody extends StatelessWidget {
       child: Stack(
         children: [
           Positioned(
-            top: -44,
-            left: 217,
+            top: -88,
+            left: -25,
             child: Container(
-              width: 250,
-              height: 240,
+              width: 240,
+              height: 250,
               decoration: BoxDecoration(
                 color: Color(0xFFE7A072).withOpacity(0.25),
                 shape: BoxShape.circle,
@@ -29,7 +29,7 @@ class SignUpBody extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Create account",
+                  "Welcome back!",
                   style: TextStyle(
                     color: Color(0xFF000000),
                     fontFamily: "DM Serif Display",
@@ -40,7 +40,7 @@ class SignUpBody extends StatelessWidget {
                 Container(
                   margin: EdgeInsets.only(left: 6),
                   child: Text(
-                    "join a trusted community",
+                    "Sign to your account",
                     style: TextStyle(
                       color: Color(0xFF888780),
                       fontFamily: "IBM Plex Sans",
@@ -49,10 +49,11 @@ class SignUpBody extends StatelessWidget {
                     ),
                   ),
                 ),
-                SignUpForm(),
-                CustomAuthButton(text: "Sign up"),
+                SignInForm(),
+
+                CustomAuthButton(text: "Sign in"),
                 SizedBox(height: 9),
-                CustomNavigatonText(direction: "sign in"),
+                CustomNavigatonText(direction: "sign up"),
               ],
             ),
           ),

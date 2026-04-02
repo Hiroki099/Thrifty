@@ -69,6 +69,10 @@ class GetStartBody extends StatelessWidget {
                   child: Container(
                     height: 70,
                     width: 350,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(19),
+                      color: Color(0xFFE7A072),
+                    ),
                     child: Center(
                       child: Text(
                         "Get Started",
@@ -77,10 +81,6 @@ class GetStartBody extends StatelessWidget {
                           fontFamily: "DM Serif Display",
                         ),
                       ),
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(19),
-                      color: Color(0xFFE7A072),
                     ),
                   ),
                 ),

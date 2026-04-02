@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
 class CustomTextField extends StatelessWidget {
-const  CustomTextField({super.key, required this.hintText, required this.legend});
+  const CustomTextField({
+    super.key,
+    required this.hintText,
+    required this.legend,
+  });
   final String hintText, legend;
 
   @override
@@ -18,10 +22,9 @@ const  CustomTextField({super.key, required this.hintText, required this.legend}
             fontWeight: FontWeight.w600,
           ),
         ),
-        SizedBox(height: 10),
-        SizedBox(
-          width: 349,
-          height: 91,
+        Container(
+          margin: EdgeInsets.only(top: 16),
+
           child: TextFormField(
             style: TextStyle(color: Color(0xFFB0AFA8)),
             decoration: InputDecoration(

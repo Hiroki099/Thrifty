@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class CustomNavigatonText extends StatelessWidget {
   const CustomNavigatonText({super.key, required this.direction});
@@ -22,7 +23,7 @@ class CustomNavigatonText extends StatelessWidget {
           ),
           GestureDetector(
             onTap: () {
-              print("nav to sign in");
+              GoRouter.of(context).go("/sign-in");
             },
             child: Text(
               "Sign in",
@@ -51,7 +52,7 @@ class CustomNavigatonText extends StatelessWidget {
           ),
           GestureDetector(
             onTap: () {
-              print("nav to sign up");
+              GoRouter.of(context).go("/sign-up");
             },
             child: Text(
               "Sign up",

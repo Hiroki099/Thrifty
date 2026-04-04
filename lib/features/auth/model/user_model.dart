@@ -15,7 +15,7 @@ class UserModel {
     this.detailUrl,
   });
 
-  factory UserModel.fromMap(Map<String, dynamic> data) => UserModel(
+  factory UserModel.fromJson(Map<String, dynamic> data) => UserModel(
     id: data['id'] as int?,
     username: data['username'] as String?,
     email: data['email'] as String?,

@@ -1,16 +1,16 @@
 import 'package:dio/dio.dart';
 
 class ApiService {
-  static const String baseUrl = 'https://thrifty-api-9bfr.onrender.com/api';
-  final Dio dio;
-  ApiService(this.dio);
+  static const String _baseUrl = 'https://thrifty-api-9bfr.onrender.com/api/';
+  final Dio _dio;
+  ApiService(this._dio);
   Future<Map<String, dynamic>> get({required String endpoint}) async {
-    var response = await dio.get('$baseUrl/$endpoint');
+    var response = await _dio.get('$_baseUrl/$endpoint');
     return response.data as Map<String, dynamic>;
   }
 
   Future<dynamic> post(String endpoint, Map<String, dynamic> body) async {
-    Future<Response> response = dio.post('$baseUrl/$endpoint', data: body);
+    Future<Response> response = _dio.post('$_baseUrl/$endpoint', data: body);
     return response;
   }
 

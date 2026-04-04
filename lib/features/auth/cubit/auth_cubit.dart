@@ -1,4 +1,5 @@
 import 'package:dealura/core/errors/failures.dart';
+import 'package:dealura/core/utls/save_token.dart';
 import 'package:dealura/features/auth/cubit/auth_state.dart';
 import 'package:dealura/features/auth/repository/auth_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -8,6 +9,7 @@ class AuthCubit extends Cubit<AuthState> {
 
   AuthCubit(this.repo) : super(AuthInitial());
 
+  /// Sign Up مع تسجيل دخول تلقائي
   Future<void> signUp({
     required String username,
     required String email,
@@ -30,22 +32,23 @@ class AuthCubit extends Cubit<AuthState> {
         }
       },
       (_) async {
-        // 🔥 login تلقائي
+        // نجح التسجيل → نرسل حالة نجاح SignUp
+        emit(AuthSuccess(isSignUp: true));
+
+        // تسجيل دخول تلقائي بعد التسجيل
         await signIn(username: username, password: password);
       },
     );
   }
 
+  /// Sign In
   Future<void> signIn({
     required String username,
     required String password,
   }) async {
     emit(AuthLoading());
 
-    final result = await repo.signIn(
-      username: username,
-      password: password,
-    );
+    final result = await repo.signIn(username: username, password: password);
 
     result.fold(
       (failure) {
@@ -56,7 +59,9 @@ class AuthCubit extends Cubit<AuthState> {
         }
       },
       (token) async {
-        // TODO: حفظ التوكن
+        // حفظ التوكنات بشكل آمن
+        await saveTokens(token.access!, token.refresh!);
+
         emit(AuthSuccess());
       },
     );

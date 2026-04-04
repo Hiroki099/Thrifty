@@ -39,6 +39,8 @@ dependencies:
   dio: ^5.9.2
   dartz: ^0.10.1
   flutter_bloc: ^9.1.1
+  shared_preferences: ^2.5.5
+  flutter_secure_storage: ^10.0.0
 
 dev_dependencies:
   flutter_test:

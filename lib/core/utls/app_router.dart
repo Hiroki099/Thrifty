@@ -1,5 +1,6 @@
 import 'package:dealura/features/auth/view/pages/sign_in_page.dart';
 import 'package:dealura/features/auth/view/pages/sign_up_page.dart';
+import 'package:dealura/features/home/view/pages/home_page.dart';
 import 'package:dealura/features/onboarding/view/pages/get_started_page.dart';
 import 'package:go_router/go_router.dart';
 
@@ -15,6 +16,7 @@ abstract class AppRouter {
         path: '/sign-in',
         builder: (context, state) => const SignInPage(),
       ),
+      GoRoute(path: '/home', builder: (context, state) => const HomePage()),
     ],
   );
 }

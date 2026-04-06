@@ -5,8 +5,10 @@ class CustomTextField extends StatelessWidget {
     super.key,
     required this.hintText,
     required this.legend,
+    required this.controller,
   });
   final String hintText, legend;
+  final TextEditingController controller;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +27,7 @@ class CustomTextField extends StatelessWidget {
         Container(
           margin: EdgeInsets.only(top: 16),
 
-          child: TextFormField(
+          child: TextFormField(controller: controller,
             style: TextStyle(color: Color(0xFFB0AFA8)),
             decoration: InputDecoration(
               contentPadding: EdgeInsets.all(14),

@@ -22,7 +22,7 @@ class AuthRepositoryImpl implements AuthRepository {
         'password': password,
         'username': username,
       });
-
+      print("SignUp Response: ${response.data}");
       final user = UserModel.fromJson(response.data);
       return Right(user);
     } on DioException catch (e) {

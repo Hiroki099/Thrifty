@@ -9,7 +9,7 @@ class AuthCubit extends Cubit<AuthState> {
 
   AuthCubit(this.repo) : super(AuthInitial());
 
-  /// Sign Up مع تسجيل دخول تلقائي
+  /// ✅ SIGN UP (بدون login تلقائي)
   Future<void> signUp({
     required String username,
     required String email,
@@ -31,24 +31,23 @@ class AuthCubit extends Cubit<AuthState> {
           emit(AuthFailure(failure.message));
         }
       },
-      (_) async {
-        // نجح التسجيل → نرسل حالة نجاح SignUp
-        emit(AuthSuccess(isSignUp: true));
-
-        // تسجيل دخول تلقائي بعد التسجيل
-        await signIn(username: username, password: password);
+      (_) {
+        emit(AuthSuccess(isSignUp: true)); // 🔥 نجاح التسجيل فقط
       },
     );
   }
 
-  /// Sign In
+  /// ✅ SIGN IN
   Future<void> signIn({
     required String username,
     required String password,
   }) async {
     emit(AuthLoading());
 
-    final result = await repo.signIn(username: username, password: password);
+    final result = await repo.signIn(
+      username: username,
+      password: password,
+    );
 
     result.fold(
       (failure) {
@@ -59,10 +58,12 @@ class AuthCubit extends Cubit<AuthState> {
         }
       },
       (token) async {
-        // حفظ التوكنات بشكل آمن
+        print("ACCESS: ${token.access}");
+        print("REFRESH: ${token.refresh}");
+
         await saveTokens(token.access!, token.refresh!);
 
-        emit(AuthSuccess());
+        emit(AuthSuccess()); // 🔥 نجاح تسجيل الدخول
       },
     );
   }

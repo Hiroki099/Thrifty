@@ -49,9 +49,12 @@ class SignInBody extends StatelessWidget {
                     ),
                   ),
                 ),
-                SignInForm(),
+                SignInForm(
+                  usernameController: TextEditingController(),
+                  passwordController: TextEditingController(),
+                ),
 
-                CustomAuthButton(text: "Sign in"),
+                CustomAuthButton(text: "Sign in", onTap: () => {}),
                 SizedBox(height: 9),
                 CustomNavigatonText(direction: "sign up"),
               ],

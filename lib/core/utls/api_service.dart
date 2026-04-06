@@ -9,8 +9,14 @@ class ApiService {
     return response.data as Map<String, dynamic>;
   }
 
-  Future<dynamic> post(String endpoint, Map<String, dynamic> body) async {
-    Future<Response> response = _dio.post('$_baseUrl/$endpoint', data: body);
+  Future<Response> post(String endpoint, Map<String, dynamic> body) async {
+    final response = await _dio.post(
+      '$_baseUrl$endpoint', // ⚠️ انتبه هنا
+      data: body,
+    );
+
+    print("API RESPONSE: ${response.data}"); // 🔥 للتأكد
+
     return response;
   }
 

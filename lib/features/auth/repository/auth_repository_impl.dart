@@ -65,7 +65,7 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
   }) async {
     try {
-      final response = await apiService.post('users/login/', {
+      final response = await apiService.post('token/', {
         'username': username,
         'password': password,
       });

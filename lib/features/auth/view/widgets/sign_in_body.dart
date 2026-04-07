@@ -53,11 +53,9 @@ class _SignInBodyState extends State<SignInBody> {
           inAsyncCall: isLoading,
           dismissible: false,
 
-          /// 🔥 كل تصميمك كما هو
           child: SingleChildScrollView(
             child: Stack(
               children: [
-                /// 🔵 الدائرة (كما كانت)
                 Positioned(
                   top: -88,
                   left: -25,
@@ -71,7 +69,6 @@ class _SignInBodyState extends State<SignInBody> {
                   ),
                 ),
 
-                /// 📦 المحتوى
                 Padding(
                   padding: const EdgeInsets.only(top: 190, left: 25, right: 19),
                   child: Column(

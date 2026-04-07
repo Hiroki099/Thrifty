@@ -6,6 +6,7 @@ import 'package:dealura/features/auth/view/widgets/sign_up_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
 class SignUpBody extends StatefulWidget {
   const SignUpBody({super.key});
@@ -29,68 +30,78 @@ class _SignUpBodyState extends State<SignUpBody> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Stack(
-        children: [
-          Positioned(
-            top: -44,
-            left: 217,
-            child: Container(
-              width: 250,
-              height: 240,
-              decoration: BoxDecoration(
-                color: Color(0xFFE7A072).withOpacity(0.25),
-                shape: BoxShape.circle,
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 190, left: 25, right: 19),
-            child: BlocConsumer<AuthCubit, AuthState>(
-              listener: (context, state) {
-                if (state is AuthSuccess) {
-                  context.go('/home');
-                }
+    return BlocConsumer<AuthCubit, AuthState>(
+      listener: (context, state) {
+        if (state is AuthSuccess) {
+          context.go('/home');
+        }
 
-                if (state is AuthFailure) {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(SnackBar(content: Text(state.message)));
-                }
-              },
-              builder: (context, state) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Create account",
-                      style: TextStyle(
-                        fontFamily: "DM Serif Display",
-                        fontSize: 35,
-                      ),
+        if (state is AuthFailure) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message)));
+        }
+
+        if (state is AuthValidationError) {
+          final errorMessage = state.errors.entries
+              .map((e) => "${e.key}: ${e.value.join(', ')}")
+              .join("\n");
+
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(errorMessage)));
+        }
+      },
+      builder: (context, state) {
+        final isLoading = state is AuthLoading;
+        return ModalProgressHUD(
+          inAsyncCall: isLoading,
+          dismissible: false,
+          child: SingleChildScrollView(
+            child: Stack(
+              children: [
+                Positioned(
+                  top: -44,
+                  left: 217,
+                  child: Container(
+                    width: 250,
+                    height: 240,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE7A072).withOpacity(0.25),
+                      shape: BoxShape.circle,
                     ),
-                    SizedBox(height: 8),
-                    Container(
-                      margin: EdgeInsets.only(left: 6),
-                      child: Text(
-                        "join a trusted community",
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 190, left: 25, right: 19),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Create account",
                         style: TextStyle(
-                          color: Color(0xFF888780),
-                          fontFamily: "IBM Plex Sans",
-                          fontSize: 15,
-                          fontWeight: FontWeight.w400,
+                          fontFamily: "DM Serif Display",
+                          fontSize: 35,
                         ),
                       ),
-                    ),
-                    SignUpForm(
-                      usernameController: usernameController,
-                      emailController: emailController,
-                      passwordController: passwordController,
-                    ),
-
-                    if (state is AuthLoading)
-                      Center(child: CircularProgressIndicator())
-                    else
+                      const SizedBox(height: 8),
+                      Container(
+                        margin: const EdgeInsets.only(left: 6),
+                        child: const Text(
+                          "join a trusted community",
+                          style: TextStyle(
+                            color: Color(0xFF888780),
+                            fontFamily: "IBM Plex Sans",
+                            fontSize: 15,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                      SignUpForm(
+                        usernameController: usernameController,
+                        emailController: emailController,
+                        passwordController: passwordController,
+                      ),
                       CustomAuthButton(
                         text: "Sign up",
                         onTap: () {
@@ -101,16 +112,16 @@ class _SignUpBodyState extends State<SignUpBody> {
                           );
                         },
                       ),
-
-                    SizedBox(height: 9),
-                    CustomNavigatonText(direction: "sign in"),
-                  ],
-                );
-              },
+                      const SizedBox(height: 9),
+                      CustomNavigatonText(direction: "sign in"),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

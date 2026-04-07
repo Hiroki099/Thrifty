@@ -22,38 +22,11 @@ class AuthRepositoryImpl implements AuthRepository {
         'password': password,
         'username': username,
       });
-      print("SignUp Response: ${response.data}");
+
       final user = UserModel.fromJson(response.data);
       return Right(user);
     } on DioException catch (e) {
-      //  Validation errors (400)
-      if (e.response?.statusCode == 400) {
-        final data = e.response?.data;
-
-        if (data is Map<String, dynamic>) {
-          return Left(
-            ValidationFailure(
-              errors: data.map(
-                (key, value) => MapEntry(key, List<String>.from(value)),
-              ),
-              message: _formatErrorMessage(data),
-            ),
-          );
-        }
-      }
-
-      //  Server error (500)
-      if (e.response?.statusCode == 500) {
-        return Left(ServerFailure("Server error, try again later"));
-      }
-
-      //  Network error
-      if (e.type == DioExceptionType.connectionTimeout ||
-          e.type == DioExceptionType.unknown) {
-        return Left(NetworkFailure("Check your internet connection"));
-      }
-
-      return Left(ServerFailure("Unexpected error"));
+      return _handleSignUpDioError(e);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -77,52 +50,91 @@ class AuthRepositoryImpl implements AuthRepository {
         return Left(ServerFailure("Login failed"));
       }
     } on DioException catch (e) {
-      //  1. Validation error (400 or 401)
-      if (e.response?.statusCode == 400 || e.response?.statusCode == 401) {
-        final data = e.response?.data;
-
-        if (data is Map<String, dynamic>) {
-          return Left(
-            ValidationFailure(
-              errors: data.map(
-                (key, value) => MapEntry(key, List<String>.from(value)),
-              ),
-              message: _formatErrorMessage(data),
-            ),
-          );
-        }
-
-        return Left(ServerFailure("Invalid credentials"));
-      }
-
-      //  2. Server error
-      if (e.response?.statusCode == 500) {
-        return Left(ServerFailure("Server error, try again later"));
-      }
-
-      //  3. Network error
-      if (e.type == DioExceptionType.connectionTimeout ||
-          e.type == DioExceptionType.unknown) {
-        return Left(NetworkFailure("Check your internet connection"));
-      }
-
-      return Left(ServerFailure("Unexpected error"));
+      return _handleDioError(e);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
   }
 
-  String _formatErrorMessage(Map<String, dynamic> data) {
-    final buffer = StringBuffer();
+  Either<Failure, T> _handleSignUpDioError<T>(DioException e) {
+    final statusCode = e.response?.statusCode;
 
+    if (statusCode == 400) {
+      final data = e.response?.data;
+      if (data is Map<String, dynamic>) {
+        final errorsMap = <String, List<String>>{};
+        data.forEach((key, value) {
+          if (value is List) {
+            errorsMap[key] = List<String>.from(value);
+          } else if (value is String) {
+            errorsMap[key] = [value];
+          }
+        });
+        return Left(
+          ValidationFailure(
+            errors: errorsMap,
+            message: _formatErrorMessage(errorsMap),
+          ),
+        );
+      }
+      return Left(ServerFailure("Invalid registration data"));
+    }
+
+    if (statusCode == 500) {
+      return Left(ServerFailure("Server error, try again later"));
+    }
+
+    if (e.type == DioExceptionType.connectionTimeout ||
+        e.type == DioExceptionType.unknown) {
+      return Left(NetworkFailure("Check your internet connection"));
+    }
+
+    return Left(ServerFailure("Unexpected error"));
+  }
+
+  Either<Failure, T> _handleDioError<T>(DioException e) {
+    final statusCode = e.response?.statusCode;
+
+    if (statusCode == 400 || statusCode == 401) {
+      final data = e.response?.data;
+      if (data is Map<String, dynamic>) {
+        final errorsMap = <String, List<String>>{};
+        data.forEach((key, value) {
+          if (value is List) {
+            errorsMap[key] = List<String>.from(value);
+          } else if (value is String) {
+            errorsMap[key] = [value];
+          }
+        });
+        return Left(
+          ValidationFailure(
+            errors: errorsMap,
+            message: _formatErrorMessage(errorsMap),
+          ),
+        );
+      }
+      return Left(ServerFailure("Invalid credentials"));
+    }
+
+    if (statusCode == 500) {
+      return Left(ServerFailure("Server error, try again later"));
+    }
+
+    if (e.type == DioExceptionType.connectionTimeout ||
+        e.type == DioExceptionType.unknown) {
+      return Left(NetworkFailure("Check your internet connection"));
+    }
+
+    return Left(ServerFailure("Unexpected error"));
+  }
+
+  String _formatErrorMessage(Map<String, List<String>> data) {
+    final buffer = StringBuffer();
     data.forEach((key, value) {
-      if (value is List) {
-        for (var msg in value) {
-          buffer.writeln(msg);
-        }
+      for (var msg in value) {
+        buffer.writeln(msg);
       }
     });
-
     return buffer.toString().trim();
   }
 }

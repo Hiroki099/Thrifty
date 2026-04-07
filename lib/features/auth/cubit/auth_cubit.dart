@@ -9,7 +9,6 @@ class AuthCubit extends Cubit<AuthState> {
 
   AuthCubit(this.repo) : super(AuthInitial());
 
-  /// ✅ SIGN UP (بدون login تلقائي)
   Future<void> signUp({
     required String username,
     required String email,
@@ -32,12 +31,11 @@ class AuthCubit extends Cubit<AuthState> {
         }
       },
       (_) {
-        emit(AuthSuccess(isSignUp: true)); // 🔥 نجاح التسجيل فقط
+        emit(AuthSuccess(isSignUp: true)); 
       },
     );
   }
 
-  /// ✅ SIGN IN
   Future<void> signIn({
     required String username,
     required String password,
@@ -63,7 +61,7 @@ class AuthCubit extends Cubit<AuthState> {
 
         await saveTokens(token.access!, token.refresh!);
 
-        emit(AuthSuccess()); // 🔥 نجاح تسجيل الدخول
+        emit(AuthSuccess());
       },
     );
   }

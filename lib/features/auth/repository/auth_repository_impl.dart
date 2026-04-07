@@ -77,7 +77,7 @@ class AuthRepositoryImpl implements AuthRepository {
         return Left(ServerFailure("Login failed"));
       }
     } on DioException catch (e) {
-      //  1. Validation error (مثلاً wrong credentials)
+      //  1. Validation error (400 or 401)
       if (e.response?.statusCode == 400 || e.response?.statusCode == 401) {
         final data = e.response?.data;
 

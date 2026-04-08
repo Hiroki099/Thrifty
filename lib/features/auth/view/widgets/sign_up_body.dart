@@ -19,7 +19,7 @@ class _SignUpBodyState extends State<SignUpBody> {
   final usernameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-
+  final formKey = GlobalKey<FormState>();
   @override
   void dispose() {
     usernameController.dispose();
@@ -101,15 +101,18 @@ class _SignUpBodyState extends State<SignUpBody> {
                         usernameController: usernameController,
                         emailController: emailController,
                         passwordController: passwordController,
+                        formKey: formKey,
                       ),
                       CustomAuthButton(
                         text: "Sign up",
                         onTap: () {
-                          context.read<AuthCubit>().signUp(
-                            username: usernameController.text,
-                            email: emailController.text,
-                            password: passwordController.text,
-                          );
+                          if (formKey.currentState!.validate()) {
+                            context.read<AuthCubit>().signUp(
+                              username: usernameController.text,
+                              email: emailController.text,
+                              password: passwordController.text,
+                            );
+                          }
                         },
                       ),
                       const SizedBox(height: 9),

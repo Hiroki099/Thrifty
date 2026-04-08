@@ -6,10 +6,13 @@ class CustomTextField extends StatelessWidget {
     required this.hintText,
     required this.legend,
     required this.controller,
+    this.validator,
+    this.obscureText = false,
   });
   final String hintText, legend;
   final TextEditingController controller;
-
+  final String? Function(String?)? validator;
+  final bool obscureText;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -27,7 +30,10 @@ class CustomTextField extends StatelessWidget {
         Container(
           margin: EdgeInsets.only(top: 16),
 
-          child: TextFormField(controller: controller,
+          child: TextFormField(
+            controller: controller,
+            validator: validator,
+            obscureText: obscureText,
             style: TextStyle(color: Color(0xFFB0AFA8)),
             decoration: InputDecoration(
               contentPadding: EdgeInsets.all(14),

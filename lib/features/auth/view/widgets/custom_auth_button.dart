@@ -4,7 +4,7 @@ class CustomAuthButton extends StatelessWidget {
   const CustomAuthButton({super.key, required this.text, required this.onTap});
 
   final String text;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +14,9 @@ class CustomAuthButton extends StatelessWidget {
         width: 342,
         height: 65,
         decoration: BoxDecoration(
-          color: Color(0xFFE7A072),
+          color: onTap == null
+              ? Color(0xFFE7A072).withOpacity(0.5)
+              : Color(0xFFE7A072),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Center(

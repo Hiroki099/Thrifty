@@ -104,7 +104,7 @@ class _SignInBodyState extends State<SignInBody> {
 
                       CustomAuthButton(
                         text: "Sign in",
-                        onTap: () {
+                        onTap: isLoading ? null : () {
                           if (formKey.currentState!.validate()) {
                             context.read<AuthCubit>().signIn(
                               username: usernameController.text.trim(),

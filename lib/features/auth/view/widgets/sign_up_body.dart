@@ -105,15 +105,17 @@ class _SignUpBodyState extends State<SignUpBody> {
                       ),
                       CustomAuthButton(
                         text: "Sign up",
-                        onTap: () {
-                          if (formKey.currentState!.validate()) {
-                            context.read<AuthCubit>().signUp(
-                              username: usernameController.text,
-                              email: emailController.text,
-                              password: passwordController.text,
-                            );
-                          }
-                        },
+                        onTap: isLoading
+                            ? null
+                            : () {
+                                if (formKey.currentState!.validate()) {
+                                  context.read<AuthCubit>().signUp(
+                                    username: usernameController.text,
+                                    email: emailController.text,
+                                    password: passwordController.text,
+                                  );
+                                }
+                              },
                       ),
                       const SizedBox(height: 9),
                       CustomNavigatonText(direction: "sign in"),

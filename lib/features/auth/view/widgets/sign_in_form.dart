@@ -35,6 +35,7 @@ class SignInForm extends StatelessWidget {
             ),
             SizedBox(height: 24),
             CustomTextField(
+              obscureText: true,
               hintText: 'Enter your password',
               legend: 'Password',
               controller: passwordController,

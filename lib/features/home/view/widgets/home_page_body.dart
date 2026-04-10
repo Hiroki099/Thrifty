@@ -1,4 +1,6 @@
+import 'package:dealura/features/home/view/widgets/custiom_filter_list.dart';
 import 'package:dealura/features/home/view/widgets/custom_app_bar.dart';
+import 'package:dealura/features/home/view/widgets/custom_search_bar.dart';
 import 'package:flutter/material.dart';
 
 class HomePageBody extends StatelessWidget {
@@ -13,14 +15,9 @@ class HomePageBody extends StatelessWidget {
           children: [
             CustomAppBar(),
             SizedBox(height: 39),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(50),
-                color: Colors.white,
-              ),
-              height: 120,
-              width: 343,
-            ),
+            CustomSearchBar(),
+            SizedBox(height: 15),
+            CustiomFilterList(),
           ],
         ),
       ),

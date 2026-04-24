@@ -24,13 +24,14 @@ class HomePageBody extends StatelessWidget {
               width: 358,
               height: 560,
               child: GridView.builder(
+                padding: EdgeInsets.zero,
                 shrinkWrap: true,
                 itemCount: 20,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   mainAxisSpacing: 16,
                   crossAxisSpacing: 16,
-                  childAspectRatio: 171 / 237,
+                  childAspectRatio: 171 / 235,
                 ),
                 itemBuilder: (context, index) {
                   return ProductCard();

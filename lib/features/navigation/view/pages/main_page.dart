@@ -1,4 +1,5 @@
 import 'package:dealura/features/navigation/view/widgets/custom_navigation_bar.dart';
+import 'package:dealura/features/search/view/pages/search_page.dart';
 import 'package:flutter/material.dart';
 import 'package:dealura/features/home/view/pages/home_page.dart';
 
@@ -14,7 +15,7 @@ class _MainPageState extends State<MainPage> {
 
   final List<Widget> pages = [
     const HomePage(),
-    const Placeholder(), // Search
+    const SearchPage(), // Search
     const Placeholder(), // Chat
     const Placeholder(), // Profile
   ];

@@ -4,7 +4,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 class CustomBottomNavBar extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTap;
-
   const CustomBottomNavBar({
     super.key,
     required this.currentIndex,
@@ -14,18 +13,18 @@ class CustomBottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 44, // أهم تعديل
+      width: MediaQuery.of(context).size.width,
+      height: 44,
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          /// الخلفية
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
             child: Container(
               height: 44,
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.only(left: 10, right: 16),
               decoration: const BoxDecoration(
                 color: Color(0xffFBF8F2),
                 border: Border(
@@ -33,7 +32,7 @@ class CustomBottomNavBar extends StatelessWidget {
                 ),
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _item(0, 'assets/images/homeIcon.svg', 'Home'),
                   _item(1, 'assets/images/searchIcon.svg', 'Search'),
@@ -44,11 +43,9 @@ class CustomBottomNavBar extends StatelessWidget {
               ),
             ),
           ),
-
-          /// زر الإضافة
           Positioned(
             top: -3,
-            left: MediaQuery.of(context).size.width / 2 - 25,
+            left: MediaQuery.of(context).size.width / 2 - 22.5,
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () {},
@@ -77,7 +74,6 @@ class CustomBottomNavBar extends StatelessWidget {
 
   Widget _item(int index, String iconPath, String label) {
     final isActive = currentIndex == index;
-
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () => onTap(index),
@@ -89,7 +85,7 @@ class CustomBottomNavBar extends StatelessWidget {
             width: 22,
             height: 22,
             colorFilter: ColorFilter.mode(
-              isActive ? Color(0xffE8A87C) : Color(0xffB5B0A8),
+              isActive ? const Color(0xffE8A87C) : const Color(0xffB5B0A8),
               BlendMode.srcIn,
             ),
           ),
@@ -100,7 +96,9 @@ class CustomBottomNavBar extends StatelessWidget {
               fontFamily: "IBM Plex Sans",
               fontSize: 10,
               height: 1.2,
-              color: isActive ? Color(0xffE8A87C) : Color(0xffB5B0A8),
+              color: isActive
+                  ? const Color(0xffE8A87C)
+                  : const Color(0xffB5B0A8),
               fontWeight: FontWeight.w400,
             ),
           ),

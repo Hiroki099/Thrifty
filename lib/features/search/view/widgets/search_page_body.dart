@@ -1,4 +1,4 @@
-import 'package:dealura/features/home/view/widgets/product_card.dart';
+import 'package:dealura/features/product/view/widgets/product_card.dart';
 import 'package:dealura/features/search/view/widgets/search_page_header.dart';
 import 'package:flutter/material.dart';
 

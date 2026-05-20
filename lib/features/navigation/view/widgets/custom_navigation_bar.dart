@@ -1,3 +1,4 @@
+import 'package:dealura/core/utls/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -48,7 +49,9 @@ class CustomBottomNavBar extends StatelessWidget {
             left: MediaQuery.of(context).size.width / 2 - 22.5,
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onTap: () {},
+              onTap: () {
+                AppRouter.router.push('/publish');
+              },
               child: Container(
                 height: 45,
                 width: 45,

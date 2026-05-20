@@ -27,8 +27,8 @@ class StarRating extends StatelessWidget {
     }
 
     return Row(
-      children: stars,
       mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: stars,
     );
   }
 }

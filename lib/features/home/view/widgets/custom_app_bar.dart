@@ -1,3 +1,4 @@
+import 'package:dealura/core/utls/app_router.dart';
 import 'package:flutter/material.dart';
 
 class CustomAppBar extends StatelessWidget {
@@ -33,14 +34,19 @@ class CustomAppBar extends StatelessWidget {
               ),
             ],
           ),
-          Container(
-            height: 30,
-            width: 28,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Color(0xffE7A072), width: 1),
+          GestureDetector(
+            onTap: () {
+              AppRouter.router.push('/notifications');
+            },
+            child: Container(
+              height: 30,
+              width: 28,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Color(0xffE7A072), width: 1),
+              ),
+              child: Image.asset('assets/images/Bell_icon.png'),
             ),
-            child: Image.asset('assets/images/Bell_icon.png'),
           ),
         ],
       ),

@@ -18,7 +18,7 @@ class ChatDetailsBody extends StatelessWidget {
               ChatDetailsHeader(),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 17.0),
-                child: Container(
+                child: SizedBox(
                   width: double.infinity,
                   height: 490,
                   child: ListView.separated(

@@ -1,3 +1,4 @@
+import 'package:dealura/core/utls/app_router.dart';
 import 'package:dealura/features/product/view/widgets/product_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -86,32 +87,37 @@ class ProfilePage extends StatelessWidget {
                   const SizedBox(height: 18),
 
                   /// Edit Button
-                  Container(
-                    decoration: BoxDecoration(
-                      color: const Color(0xffE8A87C),
-                      borderRadius: BorderRadius.circular(25),
-                    ),
-                    height: 36,
-                    width: 127,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 22.0,
-                        vertical: 9,
+                  GestureDetector(
+                    onTap: () {
+                      AppRouter.router.push('/edit_profile');
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xffE8A87C),
+                        borderRadius: BorderRadius.circular(25),
                       ),
-                      child: Row(
-                        children: [
-                          SvgPicture.asset("assets/images/pen.svg"),
-                          const SizedBox(width: 2),
-                          const Text(
-                            "Edit profile",
-                            style: TextStyle(
-                              fontFamily: "IBM Plex Sans",
-                              fontSize: 13,
-                              fontWeight: FontWeight.w400,
-                              color: Color(0xFFFFFFFF),
+                      height: 36,
+                      width: 127,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 22.0,
+                          vertical: 9,
+                        ),
+                        child: Row(
+                          children: [
+                            SvgPicture.asset("assets/images/pen.svg"),
+                            const SizedBox(width: 2),
+                            const Text(
+                              "Edit profile",
+                              style: TextStyle(
+                                fontFamily: "IBM Plex Sans",
+                                fontSize: 13,
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xFFFFFFFF),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),

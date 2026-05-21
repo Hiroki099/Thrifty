@@ -121,7 +121,7 @@ class _PublishPageState extends State<PublishPage> {
                   decoration: BoxDecoration(
                     color: const Color(0xffF3EDE4),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xffE5E2DC)),
+                    border: Border.all(color: const Color(0xffE5E2DC),),
                   ),
                   child: Wrap(
                     spacing: 12,

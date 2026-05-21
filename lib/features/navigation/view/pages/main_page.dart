@@ -1,3 +1,4 @@
+import 'package:dealura/features/chat/view/pages/chats_page.dart';
 import 'package:dealura/features/navigation/view/widgets/custom_navigation_bar.dart';
 import 'package:dealura/features/profile/view/pages/profile_page.dart';
 import 'package:dealura/features/search/view/pages/search_page.dart';
@@ -17,7 +18,7 @@ class _MainPageState extends State<MainPage> {
   final List<Widget> pages = [
     const HomePage(),
     const SearchPage(), // Search
-    const Placeholder(), // Chat
+    const ChatsPage(), // Chat
     const ProfilePage(), // Profile
   ];
 

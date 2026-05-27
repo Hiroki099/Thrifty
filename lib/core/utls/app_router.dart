@@ -50,7 +50,10 @@ abstract class AppRouter {
         path: '/edit_profile',
         builder: (context, state) => const EditProfilePage(),
       ),
-      GoRoute(path: '/account_setting', builder: (context, state) => const AccountSettingPage())
+      GoRoute(
+        path: '/account_setting',
+        builder: (context, state) => const AccountSettingPage(),
+      ),
     ],
   );
 }

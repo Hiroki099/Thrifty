@@ -46,5 +46,4 @@ class ChatBubble extends StatelessWidget {
   }
 }
 
-
 //todo: make an incoming and outgoing chat bubble with color 0xff65B091 for incoming and 0xffE8A87C for outgoing

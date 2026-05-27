@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 Widget dot(bool active, String type) {

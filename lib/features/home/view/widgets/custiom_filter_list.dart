@@ -19,4 +19,3 @@ class CustiomFilterList extends StatelessWidget {
     );
   }
 }
-

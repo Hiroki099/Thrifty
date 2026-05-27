@@ -2,19 +2,14 @@ import 'package:dealura/features/product/view/widgets/star_rating_widget.dart';
 import 'package:flutter/material.dart';
 
 class SellerInfo extends StatelessWidget {
-  const SellerInfo({
-    super.key,
-  });
+  const SellerInfo({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         border: Border.symmetric(
-          horizontal: BorderSide(
-            color: Color(0xffB5B0A8),
-            width: 0.5,
-          ),
+          horizontal: BorderSide(color: Color(0xffB5B0A8), width: 0.5),
         ),
       ),
       padding: const EdgeInsets.symmetric(vertical: 20),

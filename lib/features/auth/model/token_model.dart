@@ -8,5 +8,4 @@ class TokenModel {
     refresh: json['refresh'] as String?,
     access: json['access'] as String?,
   );
-
 }

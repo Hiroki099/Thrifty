@@ -5,7 +5,7 @@ class AuthInitial extends AuthState {}
 class AuthLoading extends AuthState {}
 
 class AuthSuccess extends AuthState {
-  final bool isSignUp; 
+  final bool isSignUp;
   AuthSuccess({this.isSignUp = false});
 }
 

@@ -7,7 +7,8 @@ class ChatTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {AppRouter.router.push('/chat_details');
+      onTap: () {
+        AppRouter.router.push('/chat_details');
       },
       child: Container(
         height: 90,

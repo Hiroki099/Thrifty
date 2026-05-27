@@ -11,7 +11,6 @@ class ValidationFailure extends Failure {
     : super(message);
 }
 
-
 class ServerFailure extends Failure {
   ServerFailure(super.message);
 }

@@ -31,7 +31,7 @@ class AuthCubit extends Cubit<AuthState> {
         }
       },
       (_) {
-        emit(AuthSuccess(isSignUp: true)); 
+        emit(AuthSuccess(isSignUp: true));
       },
     );
   }
@@ -42,10 +42,7 @@ class AuthCubit extends Cubit<AuthState> {
   }) async {
     emit(AuthLoading());
 
-    final result = await repo.signIn(
-      username: username,
-      password: password,
-    );
+    final result = await repo.signIn(username: username, password: password);
 
     result.fold(
       (failure) {

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 
 class SearchHeader extends StatelessWidget {
   const SearchHeader({super.key});
@@ -9,11 +8,9 @@ class SearchHeader extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        SizedBox(height: 16),
         Row(
           children: [
-            SizedBox(width: 13),
-            SvgPicture.asset('assets/images/go_back.svg'),
-            const SizedBox(width: 41),
             Expanded(
               child: TextFormField(
                 style: TextStyle(

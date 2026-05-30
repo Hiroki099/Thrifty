@@ -33,7 +33,12 @@ class ProfilePage extends StatelessWidget {
                           fontFamily: "DM Serif Display",
                         ),
                       ),
-                      SvgPicture.asset("assets/images/packet.svg"),
+                      GestureDetector(
+                        onTap: () {
+                          AppRouter.router.push('/balance');
+                        },
+                        child: SvgPicture.asset("assets/images/packet.svg"),
+                      ),
                     ],
                   ),
 

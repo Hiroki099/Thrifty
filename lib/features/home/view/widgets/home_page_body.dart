@@ -5,7 +5,8 @@ import 'package:dealura/features/product/view/widgets/product_card.dart';
 import 'package:flutter/material.dart';
 
 class HomePageBody extends StatelessWidget {
-  const HomePageBody({super.key});
+  final VoidCallback onSearchTap;
+  const HomePageBody({super.key, required this.onSearchTap});
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +17,7 @@ class HomePageBody extends StatelessWidget {
           children: [
             CustomAppBar(),
             SizedBox(height: 39),
-            CustomSearchBar(),
+            CustomSearchBar(onTap: onSearchTap),
             SizedBox(height: 15),
             CustiomFilterList(),
             SizedBox(height: 28),

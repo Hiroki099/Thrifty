@@ -15,12 +15,18 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   int currentIndex = 0;
 
-  final List<Widget> pages = [
-    const HomePage(),
-    const SearchPage(), // Search
-    const ChatsPage(), // Chat
-    const ProfilePage(), // Profile
-  ];
+  late final List<Widget> pages;
+
+  @override
+  void initState() {
+    super.initState();
+    pages = [
+      HomePage(onSearchTap: () => onTabChanged(1)),
+      const SearchPage(), // Search
+      const ChatsPage(), // Chat
+      const ProfilePage(), // Profile
+    ];
+  }
 
   void onTabChanged(int index) {
     setState(() {

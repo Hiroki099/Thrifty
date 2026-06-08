@@ -33,12 +33,6 @@ class ProfilePage extends StatelessWidget {
                           fontFamily: "DM Serif Display",
                         ),
                       ),
-                      GestureDetector(
-                        onTap: () {
-                          AppRouter.router.push('/balance');
-                        },
-                        child: SvgPicture.asset("assets/images/packet.svg"),
-                      ),
                     ],
                   ),
 
@@ -79,174 +73,110 @@ class ProfilePage extends StatelessWidget {
                     ),
                   ),
 
-                  const Text(
-                    "Damascus,Syria",
-                    style: TextStyle(
-                      fontFamily: "IBM Plex Sans",
-                      fontSize: 13,
-                      fontWeight: FontWeight.w400,
-                      color: Color(0xff8A8580),
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset(
+                        "assets/images/star.svg",
+                        width: 15,
+                        height: 15,
+                        colorFilter: ColorFilter.mode(
+                          Color(0xffE8A87C),
+                          BlendMode.srcIn,
+                        ),
+                      ),
+                      const Text(
+                        "4.5(45)",
+                        style: TextStyle(
+                          fontFamily: 'IBM Plex Sans',
+                          fontSize: 11,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
                   ),
 
                   const SizedBox(height: 18),
 
                   /// Edit Button
-                  GestureDetector(
-                    onTap: () {
-                      AppRouter.router.push('/edit_profile');
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: const Color(0xffE8A87C),
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      height: 36,
-                      width: 127,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 22.0,
-                          vertical: 9,
-                        ),
-                        child: Row(
-                          children: [
-                            SvgPicture.asset("assets/images/pen.svg"),
-                            const SizedBox(width: 2),
-                            const Text(
-                              "Edit profile",
-                              style: TextStyle(
-                                fontFamily: "IBM Plex Sans",
-                                fontSize: 13,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xFFFFFFFF),
-                              ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          AppRouter.router.push('/edit_profile');
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xffE8A87C),
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          height: 36,
+                          width: 127,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 22.0,
+                              vertical: 9,
                             ),
-                          ],
+                            child: Row(
+                              children: [
+                                SvgPicture.asset("assets/images/pen.svg"),
+                                const SizedBox(width: 2),
+                                const Text(
+                                  "Edit profile",
+                                  style: TextStyle(
+                                    fontFamily: "IBM Plex Sans",
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w400,
+                                    color: Color(0xFFFFFFFF),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                      SizedBox(width: 13),
+                      GestureDetector(
+                        onTap: () {
+                          AppRouter.router.push('/balance');
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: const Color(0xffE8A87C)),
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                          height: 36,
+                          width: 127,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 22.0,
+                              vertical: 9,
+                            ),
+                            child: Row(
+                              children: [
+                                SvgPicture.asset("assets/images/packet2.svg"),
+                                const SizedBox(width: 2),
+                                const Text(
+                                  "5000 SYP",
+                                  style: TextStyle(
+                                    fontFamily: "IBM Plex Sans",
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w400,
+                                    color: const Color(0xffE8A87C),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 18),
-
-                  /// Stats
-                  SizedBox(
-                    width: 242,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        statItem("13", "Listings"),
-                        statItem("22", "Deals"),
-                        statItem("4.5", "Ratings"),
-                        statItem("2", "Donations"),
-                      ],
-                    ),
-                  ),
-
                   const SizedBox(height: 18),
 
                   /// Tags
-                  SizedBox(
-                    width: 319,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          height: 30,
-                          width: 90,
-                          decoration: BoxDecoration(
-                            color: const Color(0xffF3EDE4),
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                              right: 10,
-                              left: 15,
-                              top: 6,
-                              bottom: 6,
-                            ),
-                            child: Row(
-                              children: [
-                                SvgPicture.asset("assets/images/check.svg"),
-                                const SizedBox(width: 4),
-                                const Text(
-                                  "verified",
-                                  style: TextStyle(
-                                    fontFamily: 'IBM Plex Sans',
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w400,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-
-                        Container(
-                          height: 30,
-                          width: 90,
-                          decoration: BoxDecoration(
-                            color: const Color(0xffF3EDE4),
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                              right: 10,
-                              left: 10,
-                              top: 6,
-                              bottom: 6,
-                            ),
-                            child: Row(
-                              children: [
-                                SvgPicture.asset("assets/images/star.svg"),
-                                const SizedBox(width: 4),
-                                const Text(
-                                  "4.5 stars",
-                                  style: TextStyle(
-                                    fontFamily: 'IBM Plex Sans',
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w400,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-
-                        Container(
-                          height: 30,
-                          width: 90,
-                          decoration: BoxDecoration(
-                            color: const Color(0xffF3EDE4),
-                            borderRadius: BorderRadius.circular(25),
-                          ),
-                          child: const Padding(
-                            padding: EdgeInsets.only(
-                              right: 12,
-                              left: 12,
-                              top: 6,
-                              bottom: 6,
-                            ),
-                            child: Row(
-                              children: [
-                                Text(
-                                  "5 donations",
-                                  style: TextStyle(
-                                    fontFamily: 'IBM Plex Sans',
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w400,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
                   const SizedBox(height: 33),
 
                   /// Tabs
@@ -283,7 +213,7 @@ class ProfilePage extends StatelessWidget {
                                 childAspectRatio: 0.72,
                               ),
                           itemBuilder: (context, index) {
-                            return const ProductCard();
+                            // return const ProductCard();
                           },
                         ),
 

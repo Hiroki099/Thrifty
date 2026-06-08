@@ -30,9 +30,9 @@ abstract class AppRouter {
       GoRoute(
         path: '/product_details',
         builder: (context, state) {
-          final type = state.extra as String;
+          final id = state.extra as int?;
 
-          return ProductDetailsPage(type: type);
+          return ProductDetailsPage(id: id);
         },
       ),
       GoRoute(

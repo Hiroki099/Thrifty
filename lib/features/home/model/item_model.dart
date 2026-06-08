@@ -14,6 +14,7 @@ class ItemModel {
   DateTime? createdAt;
   DateTime? updatedAt;
   String? detailUrl;
+  String? image;
 
   ItemModel({
     this.id,
@@ -27,9 +28,8 @@ class ItemModel {
     this.createdAt,
     this.updatedAt,
     this.detailUrl,
+    this.image,
   });
-
-
 
   factory ItemModel.fromMap(Map<String, dynamic> data) => ItemModel(
     id: data['id'] as int?,
@@ -53,6 +53,7 @@ class ItemModel {
         ? null
         : DateTime.parse(data['updated_at'] as String),
     detailUrl: data['detail_url'] as String?,
+    image: data['image'] as String?,
   );
 
   /// `dart:convert`

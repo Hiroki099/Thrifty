@@ -13,3 +13,8 @@ Future<String?> getAccessToken() async {
 Future<String?> getRefreshToken() async {
   return await storage.read(key: 'refresh_token');
 }
+
+Future<void> clearTokens() async {
+  await storage.delete(key: 'access_token');
+  await storage.delete(key: 'refresh_token');
+}

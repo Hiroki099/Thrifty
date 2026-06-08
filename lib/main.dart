@@ -2,7 +2,6 @@ import 'package:dealura/core/utls/api_service.dart';
 import 'package:dealura/core/utls/app_router.dart';
 import 'package:dealura/features/auth/cubit/auth_cubit.dart';
 import 'package:dealura/features/auth/repository/auth_repository_impl.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,7 +22,7 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => AuthCubit(AuthRepositoryImpl(ApiService(Dio()))),
+          create: (context) => AuthCubit(AuthRepositoryImpl(ApiService())),
         ),
       ],
       child: MaterialApp.router(

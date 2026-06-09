@@ -1,3 +1,5 @@
+import 'package:dealura/core/utls/app_router.dart';
+import 'package:dealura/features/profile/repository/profile_repository_impl.dart';
 import 'package:dealura/features/profile/view/pages/edit_profile_page.dart';
 import 'package:dealura/features/profile/view/widgets/profile_button.dart';
 import 'package:flutter/material.dart';
@@ -44,9 +46,13 @@ class AccountSettingPage extends StatelessWidget {
           SizedBox(height: 18),
           ProfileButton(
             text: "log out",
-            icon: Icon(Icons.logout, size: 24, color: Colors.black87),
+            icon: const Icon(Icons.logout, size: 24, color: Colors.black87),
             onTap: () {
-              showConfirmationDialog(context, "log out");
+              showConfirmationDialog(context, "log out", () async {
+                await ProfileRepositoryImpl().logOut();
+
+                AppRouter.router.go('/');
+              });
             },
           ),
           ProfileButton(
@@ -57,7 +63,11 @@ class AccountSettingPage extends StatelessWidget {
               height: 24,
             ),
             onTap: () {
-              showConfirmationDialog(context, "delete account");
+              showConfirmationDialog(context, "delete account", () async {
+                await ProfileRepositoryImpl().deleteAccount();
+
+                AppRouter.router.go('/');
+              });
             },
           ),
           ProfileButton(

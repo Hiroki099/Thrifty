@@ -164,7 +164,7 @@ class ProfilePage extends StatelessWidget {
                                     fontFamily: "IBM Plex Sans",
                                     fontSize: 13,
                                     fontWeight: FontWeight.w400,
-                                    color: const Color(0xffE8A87C),
+                                    color: Color(0xffE8A87C),
                                   ),
                                 ),
                               ],
@@ -213,6 +213,8 @@ class ProfilePage extends StatelessWidget {
                                 childAspectRatio: 0.72,
                               ),
                           itemBuilder: (context, index) {
+                            return null;
+                          
                             // return const ProductCard();
                           },
                         ),

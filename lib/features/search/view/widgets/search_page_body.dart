@@ -29,6 +29,8 @@ class SearchPageBody extends StatelessWidget {
                 childAspectRatio: 171 / 236,
               ),
               itemBuilder: (context, index) {
+                return null;
+              
                 // return ProductCard();
               },
             ),

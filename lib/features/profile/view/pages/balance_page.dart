@@ -105,7 +105,7 @@ class BalancePage extends StatelessWidget {
                           children: [
                             ListView.separated(
                               itemCount: 10,
-                              separatorBuilder: (_, __) =>
+                              separatorBuilder: (_, _) =>
                                   const Divider(color: Color(0xffE5E2DC)),
                               itemBuilder: (context, index) {
                                 return const Padding(
@@ -137,7 +137,7 @@ class BalancePage extends StatelessWidget {
                             ),
                             ListView.separated(
                               itemCount: 10,
-                              separatorBuilder: (_, __) =>
+                              separatorBuilder: (_, _) =>
                                   const Divider(color: Color(0xffE5E2DC)),
                               itemBuilder: (context, index) {
                                 return const Padding(

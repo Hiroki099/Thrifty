@@ -86,12 +86,16 @@ class EditProfilePage extends StatelessWidget {
   }
 }
 
-void showConfirmationDialog(BuildContext context, String action) {
+void showConfirmationDialog(
+  BuildContext context,
+  String action,
+  Future<void> Function() onConfirm,
+) {
   showDialog(
     context: context,
-    builder: (BuildContext dialogContext) {
+    builder: (dialogContext) {
       return AlertDialog(
-        backgroundColor: Color(0XFFE8A87C),
+        backgroundColor: const Color(0XFFE8A87C),
         title: const Text(
           "Are you sure?",
           style: TextStyle(
@@ -107,26 +111,17 @@ void showConfirmationDialog(BuildContext context, String action) {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text(
-              "Cancel",
-              style: TextStyle(
-                color: Colors.white,
-                fontFamily: "IBM Plex Sans",
-              ),
-            ),
+            onPressed: () {
+              Navigator.pop(dialogContext);
+            },
+            child: const Text("Cancel", style: TextStyle(color: Colors.white)),
           ),
           TextButton(
-            onPressed: () {
-              Navigator.of(dialogContext).pop();
+            onPressed: () async {
+              Navigator.pop(dialogContext);
+              await onConfirm();
             },
-            child: const Text(
-              "Yes",
-              style: TextStyle(
-                color: Colors.white,
-                fontFamily: "IBM Plex Sans",
-              ),
-            ),
+            child: const Text("Yes", style: TextStyle(color: Colors.white)),
           ),
         ],
       );

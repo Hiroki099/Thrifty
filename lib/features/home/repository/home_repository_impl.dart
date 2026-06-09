@@ -17,9 +17,9 @@ class HomeRepositoryImpl implements HomeRepository {
         endpoint: 'items/list/',
         queryParameters: {
           'available': true,
-          if (categoryId != null) 'category': categoryId,
-          if (listringType != null) 'type': listringType,
-          if (isRecommended != null) 'recommended': isRecommended,
+          'category': ?categoryId,
+          'type': ?listringType,
+          'recommended': ?isRecommended,
         },
       );
 
@@ -30,6 +30,7 @@ class HomeRepositoryImpl implements HomeRepository {
     }
   }
 
+  @override
   Future<List<CategoryModel>> getCategoriesList() async {
     try {
       final data = await apiService.get(endpoint: 'categories/list/');

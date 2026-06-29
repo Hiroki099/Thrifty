@@ -1,13 +1,42 @@
 import 'package:dealura/core/utls/app_router.dart';
+import 'package:dealura/features/auth/model/user_model.dart';
 import 'package:dealura/features/product/view/widgets/product_card.dart';
+import 'package:dealura/features/profile/model/wallet_model.dart';
+import 'package:dealura/features/profile/repository/profile_repository_impl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
   @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  UserModel? user;
+  WalletModel? wallet;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    loadProfile();
+  }
+
+  Future<void> loadProfile() async {
+    user = await ProfileRepositoryImpl().getMyProfile();
+    wallet = await ProfileRepositoryImpl().getMyWallet();
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -40,33 +69,31 @@ class ProfilePage extends StatelessWidget {
 
                   /// Avatar
                   Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(50),
-                      border: Border.all(
-                        color: const Color(0xFFE8A87C),
-                        width: 2,
-                      ),
-                    ),
                     width: 80,
                     height: 80,
-                    child: const Center(
-                      child: Text(
-                        "S",
-                        style: TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.w400,
-                          fontFamily: "DM Serif Display",
-                        ),
-                      ),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Color(0xffE8A87C)),
                     ),
+                    clipBehavior: Clip.antiAlias,
+                    child: user?.profilePictureUrl != null
+                        ? Image.network(
+                            user!.profilePictureUrl!,
+                            fit: BoxFit.cover,
+                          )
+                        : Center(
+                            child: Text(
+                              user?.username?.substring(0, 1).toUpperCase() ??
+                                  "?",
+                            ),
+                          ),
                   ),
-
                   const SizedBox(height: 8),
 
                   /// Name
-                  const Text(
-                    "Sarah M.",
-                    style: TextStyle(
+                  Text(
+                    user?.username ?? '',
+                    style: const TextStyle(
                       fontFamily: "IBM Plex Sans",
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -85,14 +112,8 @@ class ProfilePage extends StatelessWidget {
                           BlendMode.srcIn,
                         ),
                       ),
-                      const Text(
-                        "4.5(45)",
-                        style: TextStyle(
-                          fontFamily: 'IBM Plex Sans',
-                          fontSize: 11,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.black,
-                        ),
+                      Text(
+                        "${user?.averageRating ?? 0} (${user?.ratingCount ?? 0})",
                       ),
                     ],
                   ),
@@ -155,12 +176,13 @@ class ProfilePage extends StatelessWidget {
                               vertical: 9,
                             ),
                             child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 SvgPicture.asset("assets/images/packet2.svg"),
                                 const SizedBox(width: 2),
-                                const Text(
-                                  "5000 SYP",
-                                  style: TextStyle(
+                                Text(
+                                  "${formatBalance(wallet?.balance ?? '0')} SYP",
+                                  style: const TextStyle(
                                     fontFamily: "IBM Plex Sans",
                                     fontSize: 13,
                                     fontWeight: FontWeight.w400,
@@ -181,6 +203,7 @@ class ProfilePage extends StatelessWidget {
 
                   /// Tabs
                   const TabBar(
+                    indicatorSize: TabBarIndicatorSize.tab,
                     indicatorColor: Color(0xffE8A87C),
                     labelColor: Color(0xffE8A87C),
                     unselectedLabelColor: Color(0xffB5B0A8),
@@ -214,7 +237,7 @@ class ProfilePage extends StatelessWidget {
                               ),
                           itemBuilder: (context, index) {
                             return null;
-                          
+
                             // return const ProductCard();
                           },
                         ),
@@ -256,4 +279,22 @@ class ProfilePage extends StatelessWidget {
       ],
     );
   }
+}
+
+String formatBalance(String balance) {
+  final value = double.tryParse(balance) ?? 0;
+  final isNegative = value < 0;
+  final absValue = value.abs();
+
+  String formatted;
+
+  if (absValue >= 1000000) {
+    formatted = "${(absValue / 1000000).toStringAsFixed(0)}M";
+  } else if (absValue >= 1000) {
+    formatted = "${(absValue / 1000).toStringAsFixed(1)}K";
+  } else {
+    formatted = absValue.toStringAsFixed(0);
+  }
+
+  return isNegative ? "-$formatted" : formatted;
 }

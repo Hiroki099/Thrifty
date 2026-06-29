@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 class WalletModel {
   int? id;
   String? balance;
@@ -7,7 +5,7 @@ class WalletModel {
 
   WalletModel({this.id, this.balance, this.updatedAt});
 
-  factory WalletModel.fromMap(Map<String, dynamic> data) => WalletModel(
+  factory WalletModel.fromJson(Map<String, dynamic> data) => WalletModel(
     id: data['id'] as int?,
     balance: data['balance'] as String?,
     updatedAt: data['updated_at'] == null
@@ -20,10 +18,4 @@ class WalletModel {
     'balance': balance,
     'updated_at': updatedAt?.toIso8601String(),
   };
-
-  factory WalletModel.fromJson(String data) {
-    return WalletModel.fromMap(json.decode(data) as Map<String, dynamic>);
-  }
-
-  String toJson() => json.encode(toMap());
 }

@@ -51,15 +51,7 @@ class EditProfilePage extends StatelessWidget {
             ),
             onTap: () {},
           ),
-          ProfileButton(
-            text: "set location",
-            icon: SvgPicture.asset(
-              'assets/images/locationIcon.svg',
-              width: 24,
-              height: 24,
-            ),
-            onTap: () {},
-          ),
+
           ProfileButton(
             text: "edit name",
             icon: SvgPicture.asset(

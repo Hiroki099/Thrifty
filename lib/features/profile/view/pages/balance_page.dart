@@ -1,11 +1,61 @@
+import 'package:dealura/features/profile/model/transaction_model.dart';
+import 'package:dealura/features/profile/model/wallet_model.dart';
+import 'package:dealura/features/profile/repository/profile_repository_impl.dart';
+import 'package:dealura/features/profile/view/pages/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-class BalancePage extends StatelessWidget {
+class BalancePage extends StatefulWidget {
   const BalancePage({super.key});
 
   @override
+  State<BalancePage> createState() => _BalancePageState();
+}
+
+class _BalancePageState extends State<BalancePage> {
+  WalletModel? wallet;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    loadData();
+  }
+
+  List<TransactionModel> transactions = [];
+  List<TransactionModel> actions = [];
+  List<TransactionModel> topups = [];
+
+  Future<void> loadData() async {
+    try {
+      final results = await Future.wait([
+        ProfileRepositoryImpl().getMyWallet(),
+        ProfileRepositoryImpl().getMyWalletTransactions(),
+      ]);
+
+      wallet = results[0] as WalletModel;
+      transactions = results[1] as List<TransactionModel>;
+
+      actions = transactions.where((e) => e.kind == "purchase").toList();
+
+      topups = transactions.where((e) => e.kind == "admin_topup").toList();
+
+      setState(() {
+        isLoading = false;
+      });
+    } catch (e) {
+      debugPrint(e.toString());
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
@@ -60,7 +110,7 @@ class BalancePage extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          "5000 SYP",
+                          "${formatBalance((wallet!.balance!))} SYP",
                           style: TextStyle(
                             fontSize: 40,
                             fontWeight: FontWeight.w400,
@@ -86,6 +136,7 @@ class BalancePage extends StatelessWidget {
                   child: Column(
                     children: [
                       const TabBar(
+                        indicatorSize: TabBarIndicatorSize.tab,
                         indicatorColor: Color(0xffE8A87C),
                         indicatorWeight: 2,
                         labelColor: Colors.black,
@@ -103,70 +154,72 @@ class BalancePage extends StatelessWidget {
                       Expanded(
                         child: TabBarView(
                           children: [
-                            ListView.separated(
-                              itemCount: 10,
-                              separatorBuilder: (_, _) =>
-                                  const Divider(color: Color(0xffE5E2DC)),
-                              itemBuilder: (context, index) {
-                                return const Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 12),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "You purchased iphone 16 pro from Amy M.",
-                                        style: TextStyle(
-                                          fontFamily: "IBM Plex Sans",
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
+                            actions.isEmpty
+                                ? emptyState("No transactions yet")
+                                : ListView.separated(
+                                    itemCount: actions.length,
+                                    separatorBuilder: (_, _) =>
+                                        const Divider(color: Color(0xffE5E2DC)),
+                                    itemBuilder: (context, index) {
+                                      final transaction = actions[index];
+
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 12,
                                         ),
-                                      ),
-                                      SizedBox(height: 4),
-                                      Text(
-                                        "500k SYP was transferred to Amy M.",
-                                        style: TextStyle(
-                                          fontFamily: "IBM Plex Sans",
-                                          fontSize: 13,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              transaction.description ?? '',
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              "${formatBalance(transaction.amount ?? '0')} SYP",
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                    ],
+                                      );
+                                    },
                                   ),
-                                );
-                              },
-                            ),
-                            ListView.separated(
-                              itemCount: 10,
-                              separatorBuilder: (_, _) =>
-                                  const Divider(color: Color(0xffE5E2DC)),
-                              itemBuilder: (context, index) {
-                                return const Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 12),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "20k SYP was transferred to your account",
-                                        style: TextStyle(
-                                          fontFamily: "IBM Plex Sans",
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
+                            topups.isEmpty
+                                ? emptyState("No transfers yet")
+                                : ListView.separated(
+                                    itemCount: topups.length,
+                                    separatorBuilder: (_, _) =>
+                                        const Divider(color: Color(0xffE5E2DC)),
+                                    itemBuilder: (context, index) {
+                                      final transaction = topups[index];
+
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 12,
                                         ),
-                                      ),
-                                      SizedBox(height: 4),
-                                      Text(
-                                        "3:07 PM",
-                                        style: TextStyle(
-                                          color: Color(0xff8A8580),
-                                          fontSize: 12,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              transaction.description ?? '',
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              "admin gave you ${formatBalance(transaction.amount ?? '0')} SYP",
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                    ],
+                                      );
+                                    },
                                   ),
-                                );
-                              },
-                            ),
                           ],
                         ),
                       ),
@@ -180,4 +233,28 @@ class BalancePage extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget emptyState(String message) {
+  return Center(
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Icon(
+          Icons.receipt_long_outlined,
+          size: 60,
+          color: Color(0xffB5B0A8),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          message,
+          style: const TextStyle(
+            fontSize: 16,
+            fontFamily: "IBM Plex Sans",
+            color: Color(0xff8A8580),
+          ),
+        ),
+      ],
+    ),
+  );
 }

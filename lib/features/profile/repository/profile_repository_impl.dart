@@ -10,17 +10,15 @@ import 'package:dealura/features/profile/repository/profile_repository.dart';
 import 'package:dio/dio.dart';
 
 class ProfileRepositoryImpl implements ProfileRepository {
-@override
-Future<UserModel> getMyProfile() async {
-    UserModel user = await ApiService()
-        .get(endpoint: 'users/myprofile/')
-        .then((data) => UserModel.fromJson(data));
+  @override
+  Future<UserModel> getMyProfile() async {
+    final data = await ApiService().get(endpoint: 'users/myprofile/');
 
-    return user;
+    return UserModel.fromJson(data);
   }
 
-@override
-Future<UserModel> getUserProfile(int userId) async {
+  @override
+  Future<UserModel> getUserProfile(int userId) async {
     UserModel user = await ApiService()
         .get(endpoint: 'users/retrieve/$userId/')
         .then((data) => UserModel.fromJson(data));
@@ -28,8 +26,8 @@ Future<UserModel> getUserProfile(int userId) async {
     return user;
   }
 
-@override
-Future<List<ItemModel>> getMyItems() async {
+  @override
+  Future<List<ItemModel>> getMyItems() async {
     List<ItemModel> items = await ApiService()
         .get(endpoint: 'items/my-items/')
         .then(
@@ -39,8 +37,8 @@ Future<List<ItemModel>> getMyItems() async {
     return items;
   }
 
-@override
-Future<List<ItemModel>> getMyClaims() async {
+  @override
+  Future<List<ItemModel>> getMyClaims() async {
     List<ItemModel> items = await ApiService()
         .get(endpoint: 'items/my-claims/')
         .then(
@@ -50,8 +48,8 @@ Future<List<ItemModel>> getMyClaims() async {
     return items;
   }
 
-@override
-Future<dynamic> deleteAccount() async {
+  @override
+  Future<dynamic> deleteAccount() async {
     try {
       dynamic response = await ApiService().delete('users/delete/');
       await clearTokens();
@@ -63,13 +61,13 @@ Future<dynamic> deleteAccount() async {
     }
   }
 
-@override
-Future<void> logOut() async {
+  @override
+  Future<void> logOut() async {
     await clearTokens();
   }
 
-@override
-Future<void> editProfile({
+  @override
+  Future<void> editProfile({
     required String username,
     required String email,
     File? profileImage,
@@ -92,8 +90,8 @@ Future<void> editProfile({
     }
   }
 
-@override
-Future<WalletModel> getMyWallet()async {
+  @override
+  Future<WalletModel> getMyWallet() async {
     try {
       final data = await ApiService().get(endpoint: 'wallet/');
       return WalletModel.fromJson(data);
@@ -103,11 +101,10 @@ Future<WalletModel> getMyWallet()async {
     }
   }
 
-@override
-Future<List<TransactionModel>> getMyWalletTransactions() async {
+  @override
+  Future<List<TransactionModel>> getMyWalletTransactions() async {
     try {
-      final data =
-          await ApiService().get(endpoint: 'wallet/transactions/');
+      final data = await ApiService().get(endpoint: 'wallet/transactions/');
       return (data as List)
           .map((item) => TransactionModel.fromJson(item))
           .toList();
@@ -116,5 +113,4 @@ Future<List<TransactionModel>> getMyWalletTransactions() async {
       return Future.error(e);
     }
   }
-
 }

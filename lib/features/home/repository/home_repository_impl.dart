@@ -23,7 +23,7 @@ class HomeRepositoryImpl implements HomeRepository {
         },
       );
 
-      return (data as List).map((item) => ItemModel.fromMap(item)).toList();
+      return (data as List).map((item) => ItemModel.fromJson(item)).toList();
     } catch (e) {
       print(e);
       return [];

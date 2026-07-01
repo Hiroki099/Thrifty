@@ -1,5 +1,6 @@
 import 'package:dealura/core/utls/app_router.dart';
 import 'package:dealura/features/auth/model/user_model.dart';
+import 'package:dealura/features/home/model/item_model.dart';
 import 'package:dealura/features/product/view/widgets/product_card.dart';
 import 'package:dealura/features/profile/model/wallet_model.dart';
 import 'package:dealura/features/profile/repository/profile_repository_impl.dart';
@@ -17,7 +18,8 @@ class _ProfilePageState extends State<ProfilePage> {
   UserModel? user;
   WalletModel? wallet;
   bool isLoading = true;
-
+  List<ItemModel> myItems = [];
+  List<ItemModel> myClaims = [];
   @override
   void initState() {
     super.initState();
@@ -25,8 +27,18 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> loadProfile() async {
-    user = await ProfileRepositoryImpl().getMyProfile();
-    wallet = await ProfileRepositoryImpl().getMyWallet();
+    final results = await Future.wait([
+      ProfileRepositoryImpl().getMyProfile(),
+      ProfileRepositoryImpl().getMyWallet(),
+      ProfileRepositoryImpl().getMyItems(),
+      ProfileRepositoryImpl().getMyClaims(),
+    ]);
+
+    user = results[0] as UserModel;
+    wallet = results[1] as WalletModel;
+    myItems = results[2] as List<ItemModel>;
+    myClaims = results[3] as List<ItemModel>;
+
     setState(() {
       isLoading = false;
     });
@@ -222,27 +234,43 @@ class _ProfilePageState extends State<ProfilePage> {
 
                   /// Tab Content
                   SizedBox(
-                    height: 500,
+                    height: 300,
                     child: TabBarView(
                       children: [
-                        GridView.builder(
-                          shrinkWrap: true,
-                          itemCount: 11,
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                crossAxisSpacing: 16,
-                                mainAxisSpacing: 16,
-                                childAspectRatio: 0.72,
+                        myItems.isEmpty
+                            ? const Center(child: Text("No items yet"))
+                            : GridView.builder(
+                                itemCount: myItems.length,
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      crossAxisSpacing: 16,
+                                      mainAxisSpacing: 16,
+                                      childAspectRatio: 0.72,
+                                    ),
+                                itemBuilder: (context, index) {
+                                  return ProductCard(item: myItems[index]);
+                                },
                               ),
-                          itemBuilder: (context, index) {
-                            return null;
 
-                            // return const ProductCard();
-                          },
-                        ),
-
-                        const Center(child: Text("Your items content here")),
+                        myClaims.isEmpty
+                            ? const Center(child: Text("No requests yet"))
+                            : GridView.builder(
+                                itemCount: myClaims.length,
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                padding: EdgeInsets.zero,
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      mainAxisSpacing: 16,
+                                      crossAxisSpacing: 16,
+                                      childAspectRatio: 171 / 236,
+                                    ),
+                                itemBuilder: (context, index) {
+                                  return ProductCard(item: myClaims[index]);
+                                },
+                              ),
 
                         const Center(child: Text("Requests content here")),
                       ],

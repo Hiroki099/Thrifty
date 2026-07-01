@@ -31,7 +31,7 @@ class ItemModel {
     this.image,
   });
 
-  factory ItemModel.fromMap(Map<String, dynamic> data) => ItemModel(
+  factory ItemModel.fromJson(Map<String, dynamic> data) => ItemModel(
     id: data['id'] as int?,
     name: data['name'] as String?,
     listingType: data['listing_type'] as String?,
@@ -56,14 +56,5 @@ class ItemModel {
     image: data['image'] as String?,
   );
 
-  /// `dart:convert`
-  ///
-  /// Parses the string and returns the resulting Json object as [ItemModel].
-  factory ItemModel.fromJson(String data) {
-    return ItemModel.fromMap(json.decode(data) as Map<String, dynamic>);
-  }
-
-  /// `dart:convert`
-  ///
-  /// Converts [ItemModel] to a JSON string.
+  
 }

@@ -8,7 +8,7 @@ class ProductDetaillesRepositoryImpl implements ProductDetailesRepository {
   Future<ItemModel> getProductDetailes(int productId) async {
     final ApiService apiService = ApiService();
     final data = await apiService.get(endpoint: 'items/retrieve/$productId/');
-    return ItemModel.fromMap(data);
+    return ItemModel.fromJson(data);
   }
 
   @override

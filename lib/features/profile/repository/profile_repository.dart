@@ -7,11 +7,11 @@ import 'package:dealura/features/profile/model/wallet_model.dart';
 
 abstract class ProfileRepository {
   Future<UserModel> getMyProfile();
-  Future<void> editProfile({
-    required String username,
-    required String email,
-    File? profileImage,
-  });
+Future<void> partialEditProfile({
+  String? username,
+  String? email,
+  File? profileImage,
+});
   Future<UserModel> getUserProfile(int userId);
   Future<List<ItemModel>> getMyItems();
   Future<List<ItemModel>> getMyClaims();

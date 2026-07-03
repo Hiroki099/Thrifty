@@ -63,6 +63,28 @@ class ApiService {
 
     return response.data;
   }
+  //=========================================================================
+
+  Future<dynamic> patch(
+    String endpoint,
+    dynamic data, {
+    bool isMultipart = false,
+  }) async {
+    final token = await getAccessToken();
+
+    final response = await _dio.patch(
+      '$_baseUrl$endpoint',
+      data: data,
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer $token',
+          if (!isMultipart) 'Content-Type': 'application/json',
+        },
+      ),
+    );
+
+    return response.data;
+  }
 
   //=========================================================================
   Future<dynamic> delete(String endpoint) async {

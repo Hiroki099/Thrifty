@@ -67,25 +67,24 @@ class ProfileRepositoryImpl implements ProfileRepository {
   }
 
   @override
-  Future<void> editProfile({
-    required String username,
-    required String email,
+  Future<void> partialEditProfile({
+    String? username,
+    String? email,
     File? profileImage,
   }) async {
     try {
       final formData = FormData.fromMap({
-        'username': username,
-        'email': email,
+        if (username != null) 'username': username,
+        if (email != null) 'email': email,
         if (profileImage != null)
-          'profile_image': await MultipartFile.fromFile(
+          'profile_picture': await MultipartFile.fromFile(
             profileImage.path,
             filename: profileImage.path.split('/').last,
           ),
       });
 
-      await ApiService().put('users/myprofile/', formData, isMultipart: true);
+      await ApiService().patch('users/myprofile/', formData, isMultipart: true);
     } catch (e) {
-      print(e);
       return Future.error(e);
     }
   }

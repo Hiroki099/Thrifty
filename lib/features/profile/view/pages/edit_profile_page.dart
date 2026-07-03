@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:dealura/core/utls/app_router.dart';
+import 'package:dealura/features/profile/repository/profile_repository_impl.dart';
 import 'package:dealura/features/profile/view/widgets/profile_button.dart';
+import 'package:dealura/features/profile/view/widgets/profile_image_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -49,7 +53,27 @@ class EditProfilePage extends StatelessWidget {
               width: 24,
               height: 24,
             ),
-            onTap: () {},
+            onTap: () async {
+              final File? image = await showProfileImageBottomSheet(context);
+
+              if (image == null) return;
+
+              try {
+                await ProfileRepositoryImpl().partialEditProfile(
+                  profileImage: image,
+                );
+
+                if (context.mounted) {
+                  Navigator.pop(context, true);
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(e.toString())));
+                }
+              }
+            },
           ),
 
           ProfileButton(
@@ -59,7 +83,9 @@ class EditProfilePage extends StatelessWidget {
               width: 24,
               height: 24,
             ),
-            onTap: () {},
+            onTap: () {
+              showEditUsernameBottomSheet(context, context);
+            },
           ),
           ProfileButton(
             text: "account setting",
@@ -116,6 +142,165 @@ void showConfirmationDialog(
             child: const Text("Yes", style: TextStyle(color: Colors.white)),
           ),
         ],
+      );
+    },
+  );
+}
+
+void showEditUsernameBottomSheet(
+  BuildContext pageContext,
+  BuildContext context,
+) {
+  final controller = TextEditingController();
+
+  showModalBottomSheet(
+    context: pageContext,
+    isScrollControlled: true,
+    backgroundColor: const Color(0xFFFBF8F2),
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+    ),
+    builder: (sheetContext) {
+      return Padding(
+        padding: EdgeInsets.only(
+          left: 24,
+          right: 24,
+          top: 20,
+          bottom: MediaQuery.of(sheetContext).viewInsets.bottom + 24,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 45,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFD3D1C7),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 28),
+
+            const Text(
+              "Edit Username",
+              style: TextStyle(
+                fontFamily: "DM Serif Display",
+                fontSize: 28,
+                color: Color(0xFF4A4843),
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
+            const Text(
+              "Choose a new username for your profile.",
+              style: TextStyle(
+                fontFamily: "IBM Plex Sans",
+                fontSize: 15,
+                color: Color(0xFF8A8580),
+              ),
+            ),
+
+            const SizedBox(height: 28),
+
+            const Text(
+              "Username",
+              style: TextStyle(
+                color: Color(0xFF4A4843),
+                fontFamily: "IBM Plex Sans",
+                fontWeight: FontWeight.w600,
+                fontSize: 15,
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            TextField(
+              controller: controller,
+              style: const TextStyle(
+                fontFamily: "IBM Plex Sans",
+                fontSize: 18,
+                color: Color(0xFF4A4843),
+              ),
+              decoration: InputDecoration(
+                hintText: "Enter new username",
+                hintStyle: const TextStyle(
+                  color: Color(0xFFB0AFA8),
+                  fontFamily: "IBM Plex Sans",
+                ),
+                filled: true,
+                fillColor: Colors.white,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Color(0xFFD3D1C7)),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Color(0xFFD3D1C7)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(
+                    color: Color(0xFFE8A87C),
+                    width: 2,
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 30),
+
+            SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xffE8A87C),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  elevation: 0,
+                ),
+                onPressed: () async {
+                  final username = controller.text.trim();
+                  if (username.isEmpty) return;
+
+                  try {
+                    await ProfileRepositoryImpl().partialEditProfile(
+                      username: username,
+                    );
+
+                    Navigator.pop(sheetContext);
+                    Navigator.pop(context, true);
+                  } catch (e) {
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(SnackBar(content: Text(e.toString())));
+                  }
+                },
+                child: const Text(
+                  "Save Changes",
+                  style: TextStyle(
+                    fontFamily: "IBM Plex Sans",
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+          ],
+        ),
       );
     },
   );

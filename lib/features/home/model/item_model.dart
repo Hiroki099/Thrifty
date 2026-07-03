@@ -1,4 +1,4 @@
-import 'dart:convert';
+
 import 'package:dealura/features/auth/model/user_model.dart';
 import 'package:dealura/features/home/model/category_model.dart';
 

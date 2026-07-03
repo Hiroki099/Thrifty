@@ -137,8 +137,14 @@ class _ProfilePageState extends State<ProfilePage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       GestureDetector(
-                        onTap: () {
-                          AppRouter.router.push('/edit_profile');
+                        onTap: () async {
+                          final updated = await AppRouter.router.push<bool>(
+                            '/edit_profile',
+                          );
+
+                          if (updated == true) {
+                            loadProfile();
+                          }
                         },
                         child: Container(
                           decoration: BoxDecoration(

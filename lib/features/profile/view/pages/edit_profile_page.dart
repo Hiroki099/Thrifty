@@ -112,36 +112,96 @@ void showConfirmationDialog(
   showDialog(
     context: context,
     builder: (dialogContext) {
-      return AlertDialog(
-        backgroundColor: const Color(0XFFE8A87C),
-        title: const Text(
-          "Are you sure?",
-          style: TextStyle(
-            color: Colors.white,
-            fontFamily: "IBM Plex Sans",
-            fontSize: 22,
-            fontWeight: FontWeight.w400,
+      return Dialog(
+        backgroundColor: const Color(0xFFFBF8F2),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Are you sure?",
+                style: TextStyle(
+                  fontFamily: "DM Serif Display",
+                  fontSize: 28,
+                  color: Color(0xFF4A4843),
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              Text(
+                "Do you want to proceed with $action?",
+                style: const TextStyle(
+                  fontFamily: "IBM Plex Sans",
+                  fontSize: 15,
+                  color: Color(0xFF8A8580),
+                  height: 1.5,
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(52),
+                        side: const BorderSide(color: Color(0xFFE8A87C)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(dialogContext);
+                      },
+                      child: const Text(
+                        "Cancel",
+                        style: TextStyle(
+                          color: Color(0xFFE8A87C),
+                          fontFamily: "IBM Plex Sans",
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(width: 12),
+
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFE8A87C),
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        minimumSize: const Size.fromHeight(52),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      onPressed: () async {
+                        Navigator.pop(dialogContext);
+                        await onConfirm();
+                      },
+                      child: const Text(
+                        "Confirm",
+                        style: TextStyle(
+                          fontFamily: "IBM Plex Sans",
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
-        content: Text(
-          "Do you want to proceed with $action?",
-          style: const TextStyle(color: Colors.white70),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(dialogContext);
-            },
-            child: const Text("Cancel", style: TextStyle(color: Colors.white)),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(dialogContext);
-              await onConfirm();
-            },
-            child: const Text("Yes", style: TextStyle(color: Colors.white)),
-          ),
-        ],
       );
     },
   );

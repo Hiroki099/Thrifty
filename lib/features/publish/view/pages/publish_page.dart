@@ -1,8 +1,10 @@
 import 'dart:io';
-
+import 'package:dealura/features/home/model/category_model.dart';
+import 'package:dealura/features/home/repository/home_repository_impl.dart';
 import 'package:dealura/core/utls/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_picker/image_picker.dart';
 
 class PublishPage extends StatefulWidget {
   const PublishPage({super.key});
@@ -12,6 +14,40 @@ class PublishPage extends StatefulWidget {
 }
 
 class _PublishPageState extends State<PublishPage> {
+  @override
+  void initState() {
+    super.initState();
+    loadCategories();
+  }
+
+  List<CategoryModel> categories = [];
+  CategoryModel? selectedCategory;
+
+  bool isLoadingCategories = true;
+  Future<void> loadCategories() async {
+    final HomeRepositoryImpl homeRepository = HomeRepositoryImpl();
+    final result = await homeRepository.getCategoriesList();
+
+    setState(() {
+      categories = result;
+      isLoadingCategories = false;
+    });
+  }
+
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> pickImages() async {
+    final pickedImages = await _picker.pickMultiImage(imageQuality: 80);
+
+    if (pickedImages.isEmpty) return;
+
+    setState(() {
+      final remaining = 5 - images.length;
+
+      images.addAll(pickedImages.take(remaining).map((e) => File(e.path)));
+    });
+  }
+
   String selectedType = "Sale";
   List<File> images = [];
 
@@ -171,7 +207,7 @@ class _PublishPageState extends State<PublishPage> {
 
                       if (images.length < 5)
                         GestureDetector(
-                          onTap: () {},
+                          onTap: pickImages,
                           child: Container(
                             width: 95,
                             height: 95,
@@ -236,7 +272,47 @@ class _PublishPageState extends State<PublishPage> {
                     fontWeight: FontWeight.w400,
                   ),
                 ),
+                const SizedBox(height: 5),
 
+                isLoadingCategories
+                    ? const Center(child: CircularProgressIndicator())
+                    : Container(
+                        height: 56,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: const Color(0xffE5E2DC)),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<CategoryModel>(
+                            value: selectedCategory,
+                            isExpanded: true,
+                            hint: const Text("Select category"),
+                            items: categories.map((category) {
+                              return DropdownMenuItem<CategoryModel>(
+                                value: category,
+                                child: Text(category.name ?? ""),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                selectedCategory = value;
+                              });
+                            },
+                          ),
+                        ),
+                      ),
+                const SizedBox(height: 16),
+
+                const Text(
+                  "Description",
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontFamily: "IBM Plex Sans",
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
                 const SizedBox(height: 5),
 
                 textField(),

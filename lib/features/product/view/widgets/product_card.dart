@@ -17,13 +17,13 @@ class ProductCard extends StatelessWidget {
 
     if (isAuction) {
       badgeColor = const Color(0xff6C63FF);
-      badgeText = "Bid";
+      badgeText = "auction";
     } else if (isDonation) {
       badgeColor = const Color(0xff67B246);
-      badgeText = "Free";
+      badgeText = "donation";
     } else {
       badgeColor = const Color(0xffE8A87C);
-      badgeText = "Sale";
+      badgeText = "fixed_price";
     }
 
     return GestureDetector(

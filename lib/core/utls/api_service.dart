@@ -23,14 +23,18 @@ class ApiService {
   }
 
   //=========================================================================
-  Future<Response> post(String endpoint, Map<String, dynamic> body) async {
-    final response = await _dio.post(
+  Future<Response> post(
+    String endpoint,
+    dynamic data, {
+    bool isMultipart = false,
+  }) async {
+    return await _dio.post(
       '$_baseUrl$endpoint',
-      data: body,
-      options: Options(headers: {'Content-Type': 'application/json'}),
+      data: data,
+      options: Options(
+        headers: {if (!isMultipart) 'Content-Type': 'application/json'},
+      ),
     );
-    print("API RESPONSE: ${response.data}");
-    return response;
   }
 
   //=========================================================================

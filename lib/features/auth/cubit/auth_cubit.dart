@@ -22,16 +22,16 @@ class AuthCubit extends Cubit<AuthState> {
       password: password,
     );
 
-    result.fold(
-      (failure) {
+    await result.fold(
+      (failure) async {
         if (failure is ValidationFailure) {
           emit(AuthValidationError(failure.errors));
         } else {
           emit(AuthFailure(failure.message));
         }
       },
-      (_) {
-        emit(AuthSuccess(isSignUp: true));
+      (_) async {
+        await signIn(username: username, password: password);
       },
     );
   }

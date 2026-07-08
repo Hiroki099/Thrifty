@@ -69,7 +69,7 @@ class ProductCard extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: badgeColor.withOpacity(.15),
+                      color: badgeColor.withValues(alpha: .15),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(

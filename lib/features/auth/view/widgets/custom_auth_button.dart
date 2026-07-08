@@ -15,7 +15,7 @@ class CustomAuthButton extends StatelessWidget {
         height: 65,
         decoration: BoxDecoration(
           color: onTap == null
-              ? Color(0xFFE7A072).withOpacity(0.5)
+              ? Color(0xFFE7A072).withValues(alpha: 0.5)
               : Color(0xFFE7A072),
           borderRadius: BorderRadius.circular(10),
         ),

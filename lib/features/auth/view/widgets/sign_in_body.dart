@@ -64,7 +64,7 @@ class _SignInBodyState extends State<SignInBody> {
                     width: 250,
                     height: 240,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE7A072).withOpacity(0.25),
+                      color: const Color(0xFFE7A072).withValues(alpha: 0.25),
                       shape: BoxShape.circle,
                     ),
                   ),

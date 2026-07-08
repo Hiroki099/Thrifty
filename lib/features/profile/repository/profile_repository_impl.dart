@@ -74,8 +74,8 @@ class ProfileRepositoryImpl implements ProfileRepository {
   }) async {
     try {
       final formData = FormData.fromMap({
-        if (username != null) 'username': username,
-        if (email != null) 'email': email,
+        'username': ?username,
+        'email': ?email,
         if (profileImage != null)
           'profile_picture': await MultipartFile.fromFile(
             profileImage.path,

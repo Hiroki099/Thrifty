@@ -15,7 +15,7 @@ class GetStartBody extends StatelessWidget {
             width: 250,
             height: 240,
             decoration: BoxDecoration(
-              color: Color(0xFFE7A072).withOpacity(0.25),
+              color: Color(0xFFE7A072).withValues(alpha: 0.25),
               shape: BoxShape.circle,
             ),
           ),
@@ -28,7 +28,7 @@ class GetStartBody extends StatelessWidget {
             width: 150,
             height: 150,
             decoration: BoxDecoration(
-              color: Color(0xFFE7A072).withOpacity(0.25),
+              color: Color(0xFFE7A072).withValues(alpha: 0.25),
               shape: BoxShape.circle,
             ),
           ),

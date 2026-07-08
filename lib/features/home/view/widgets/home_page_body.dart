@@ -1,7 +1,7 @@
 import 'package:dealura/features/home/model/category_model.dart';
 import 'package:dealura/features/home/model/item_model.dart';
 import 'package:dealura/features/home/repository/home_repository_impl.dart';
-import 'package:dealura/features/home/view/widgets/custiom_filter_list.dart';
+import 'package:dealura/features/home/view/widgets/custom_filter_list.dart';
 import 'package:dealura/features/home/view/widgets/custom_app_bar.dart';
 import 'package:dealura/features/home/view/widgets/custom_search_bar.dart';
 import 'package:dealura/features/product/view/widgets/product_card.dart';
@@ -70,7 +70,7 @@ class _HomePageBodyState extends State<HomePageBody> {
 
             const SizedBox(height: 15),
 
-            CustiomFilterList(
+            CustomFilterList(
               categories: categories,
               selectedCategoryId: selectedCategoryId,
               onCategorySelected: selectCategory,

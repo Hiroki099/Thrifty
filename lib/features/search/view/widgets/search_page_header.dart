@@ -1,7 +1,20 @@
+import 'package:dealura/features/home/model/category_model.dart';
+import 'package:dealura/features/home/view/widgets/custom_filter_list.dart';
 import 'package:flutter/material.dart';
 
 class SearchHeader extends StatelessWidget {
-  const SearchHeader({super.key});
+  final List<CategoryModel> categories;
+  final int? selectedCategoryId;
+  final Function(int?) onCategorySelected;
+  final Function(String) onSearch;
+
+  const SearchHeader({
+    super.key,
+    required this.categories,
+    required this.selectedCategoryId,
+    required this.onCategorySelected,
+    required this.onSearch,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +25,7 @@ class SearchHeader extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: TextFormField(
+              child: TextFormField(onChanged: onSearch,
                 style: TextStyle(
                   color: const Color(0xff1A1A1A),
                   fontFamily: "IBM Plex Sans",
@@ -50,47 +63,12 @@ class SearchHeader extends StatelessWidget {
           ],
         ),
         SizedBox(height: 16),
-        SizedBox(
-          width: 361,
-          height: 30,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: 10,
-            itemBuilder: (context, index) => Container(
-              width: 90,
-              height: 30,
-              margin: const EdgeInsets.only(right: 8),
-              decoration: BoxDecoration(
-                color: const Color(0xffFDF3EC),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Center(
-                child: Text(
-                  'Damascus',
-                  style: TextStyle(
-                    color: const Color(0xffE7A072),
-                    fontFamily: "IBM Plex Sans",
-                    fontSize: 13,
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-              ),
-            ),
-          ),
+        CustomFilterList(
+          categories: categories,
+          selectedCategoryId: selectedCategoryId,
+          onCategorySelected: onCategorySelected,
         ),
         SizedBox(height: 8),
-        Padding(
-          padding: const EdgeInsets.only(left: 4.0),
-          child: Text(
-            '4 results for "Damascus"',
-            style: TextStyle(
-              color: const Color(0xff8A8580),
-              fontFamily: "IBM Plex Sans",
-              fontSize: 13,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ),
       ],
     );
   }

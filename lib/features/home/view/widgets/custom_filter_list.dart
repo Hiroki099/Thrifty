@@ -2,8 +2,8 @@ import 'package:dealura/features/home/model/category_model.dart';
 import 'package:dealura/features/home/view/widgets/filter_item.dart';
 import 'package:flutter/material.dart';
 
-class CustiomFilterList extends StatelessWidget {
-  const CustiomFilterList({
+class CustomFilterList extends StatelessWidget {
+  const CustomFilterList({
     super.key,
     required this.categories,
     required this.selectedCategoryId,

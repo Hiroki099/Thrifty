@@ -2,6 +2,10 @@ import 'dart:io';
 import 'package:dealura/features/home/model/category_model.dart';
 import 'package:dealura/features/home/repository/home_repository_impl.dart';
 import 'package:dealura/core/utls/app_router.dart';
+import 'package:dealura/features/publish/view/widgets/listing_type_widget.dart';
+import 'package:dealura/features/publish/view/widgets/publish_button.dart';
+import 'package:dealura/features/publish/view/widgets/select_category_widget.dart';
+import 'package:dealura/features/publish/view/widgets/select_images_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
@@ -87,56 +91,7 @@ class _PublishPageState extends State<PublishPage> {
                 const SizedBox(height: 32),
 
                 /// Listing type
-                const Text(
-                  "Listing type",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: "IBM Plex Sans",
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    PublishOption(
-                      text: "Sale",
-                      icon: Icons.sell_outlined,
-                      isSelected: selectedType == "Sale",
-                      onTap: () {
-                        setState(() {
-                          selectedType = "Sale";
-                        });
-                      },
-                    ),
-                    SizedBox(width: 12),
-
-                    PublishOption(
-                      text: "Donate",
-                      icon: Icons.card_giftcard,
-                      isSelected: selectedType == "Donate",
-                      onTap: () {
-                        setState(() {
-                          selectedType = "Donate";
-                        });
-                      },
-                    ),
-                    SizedBox(width: 12),
-
-                    PublishOption(
-                      text: "Auction",
-                      icon: Icons.bolt,
-                      isSelected: selectedType == "Auction",
-                      onTap: () {
-                        setState(() {
-                          selectedType = "Auction";
-                        });
-                      },
-                    ),
-                  ],
-                ),
+                ListingTypeWidget(),
 
                 const SizedBox(height: 28),
 
@@ -151,84 +106,16 @@ class _PublishPageState extends State<PublishPage> {
 
                 const SizedBox(height: 16),
 
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xffF3EDE4),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0xffE5E2DC)),
-                  ),
-                  child: Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
-                    children: [
-                      ...images.map(
-                        (image) => Stack(
-                          children: [
-                            Container(
-                              width: 95,
-                              height: 95,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(14),
-                                image: DecorationImage(
-                                  image: FileImage(image),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-
-                            Positioned(
-                              top: 4,
-                              right: 4,
-                              child: GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    images.remove(image);
-                                  });
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.all(4),
-                                  decoration: const BoxDecoration(
-                                    color: Colors.black54,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(
-                                    Icons.close,
-                                    color: Colors.white,
-                                    size: 16,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      if (images.length < 5)
-                        GestureDetector(
-                          onTap: pickImages,
-                          child: Container(
-                            width: 95,
-                            height: 95,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(14),
-                              border: Border.all(
-                                color: const Color(0xffE5E2DC),
-                              ),
-                              color: Colors.white,
-                            ),
-                            child: const Icon(
-                              Icons.add,
-                              color: Color(0xffB5B0A8),
-                              size: 30,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
+                /// Images
+                ImagePickerGrid(
+                  images: images,
+                  onAddPressed: pickImages,
+                  onRemovePressed: (imageToRemove) {
+                    setState(() {
+                      images.remove(imageToRemove);
+                    });
+                  },
                 ),
-
                 const SizedBox(height: 13),
 
                 /// Title
@@ -264,45 +151,11 @@ class _PublishPageState extends State<PublishPage> {
                 const SizedBox(height: 5),
 
                 /// Category
-                const Text(
-                  "Category",
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontFamily: "IBM Plex Sans",
-                    fontWeight: FontWeight.w400,
-                  ),
+                SelectCateygoryWidget(
+                  isLoadingCategories: isLoadingCategories,
+                  selectedCategory: selectedCategory,
+                  categories: categories,
                 ),
-                const SizedBox(height: 5),
-
-                isLoadingCategories
-                    ? const Center(child: CircularProgressIndicator())
-                    : Container(
-                        height: 56,
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: const Color(0xffE5E2DC)),
-                        ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<CategoryModel>(
-                            value: selectedCategory,
-                            isExpanded: true,
-                            hint: const Text("Select category"),
-                            items: categories.map((category) {
-                              return DropdownMenuItem<CategoryModel>(
-                                value: category,
-                                child: Text(category.name ?? ""),
-                              );
-                            }).toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                selectedCategory = value;
-                              });
-                            },
-                          ),
-                        ),
-                      ),
                 const SizedBox(height: 16),
 
                 const Text(
@@ -320,88 +173,11 @@ class _PublishPageState extends State<PublishPage> {
                 const SizedBox(height: 30),
 
                 /// Button
-                Container(
-                  width: double.infinity,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    color: const Color(0xffE8A87C),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  alignment: Alignment.center,
-                  child: const Text(
-                    "Publish listing",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: "IBM Plex Sans",
-                    ),
-                  ),
-                ),
+                PublishButton(),
                 SizedBox(height: 47),
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class PublishOption extends StatelessWidget {
-  const PublishOption({
-    super.key,
-    required this.text,
-    required this.icon,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  final String text;
-  final IconData icon;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 112,
-        height: 116,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(
-            color: isSelected
-                ? const Color(0xffE8A87C)
-                : const Color(0xffE5E2DC),
-            width: 1.5,
-          ),
-          color: Colors.white,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              size: 28,
-              color: isSelected
-                  ? const Color(0xffE8A87C)
-                  : const Color(0xffB5B0A8),
-            ),
-
-            const SizedBox(height: 12),
-
-            Text(
-              text,
-              style: TextStyle(
-                fontSize: 15,
-                fontFamily: "IBM Plex Sans",
-                fontWeight: FontWeight.w500,
-                color: isSelected ? const Color(0xffE8A87C) : Colors.black,
-              ),
-            ),
-          ],
         ),
       ),
     );

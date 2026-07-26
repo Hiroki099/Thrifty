@@ -1,17 +1,19 @@
 import 'package:dealura/features/home/model/category_model.dart';
 import 'package:flutter/material.dart';
 
-class SelectCateygoryWidget extends StatelessWidget {
-  const SelectCateygoryWidget({
+class SelectCategoryWidget extends StatelessWidget {
+  const SelectCategoryWidget({
     super.key,
     required this.isLoadingCategories,
     required this.selectedCategory,
     required this.categories,
+    required this.onCategorySelected,
   });
 
   final bool isLoadingCategories;
   final CategoryModel? selectedCategory;
   final List<CategoryModel> categories;
+  final Function(CategoryModel?) onCategorySelected;
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +51,7 @@ class SelectCateygoryWidget extends StatelessWidget {
                         child: Text(category.name ?? ""),
                       );
                     }).toList(),
-                    onChanged: (value) {},
+                    onChanged: onCategorySelected,
                   ),
                 ),
               ),

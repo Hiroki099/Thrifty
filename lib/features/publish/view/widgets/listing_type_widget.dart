@@ -1,9 +1,13 @@
-
+import 'package:dealura/features/publish/view/widgets/publish_theme.dart';
 import 'package:flutter/material.dart';
 
 class ListingTypeWidget extends StatelessWidget {
+  final ListingType selectedType;
+  final ValueChanged<ListingType> onChanged;
   const ListingTypeWidget({
     super.key,
+    required this.selectedType,
+    required this.onChanged,
   });
 
   @override
@@ -19,33 +23,36 @@ class ListingTypeWidget extends StatelessWidget {
             fontWeight: FontWeight.w500,
           ),
         ),
-    
+
         const SizedBox(height: 16),
-    
+
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             PublishOption(
               text: "Sale",
               icon: Icons.sell_outlined,
-              isSelected: true,
-              onTap: () {},
+              isSelected: selectedType == ListingType.sale,
+              color: PublishTheme.color(ListingType.sale),
+              onTap: () => onChanged(ListingType.sale),
             ),
             SizedBox(width: 12),
-    
+
             PublishOption(
               text: "Donate",
               icon: Icons.card_giftcard,
-              isSelected: true,
-              onTap: () {},
+              isSelected: selectedType == ListingType.donation,
+              color: PublishTheme.color(ListingType.donation),
+              onTap: () => onChanged(ListingType.donation),
             ),
             SizedBox(width: 12),
-    
+
             PublishOption(
               text: "Auction",
               icon: Icons.bolt,
-              isSelected: true,
-              onTap: () {},
+              isSelected: selectedType == ListingType.auction,
+              color: PublishTheme.color(ListingType.auction),
+              onTap: () => onChanged(ListingType.auction),
             ),
           ],
         ),
@@ -61,12 +68,14 @@ class PublishOption extends StatelessWidget {
     required this.icon,
     required this.isSelected,
     required this.onTap,
+    required this.color,
   });
 
   final String text;
   final IconData icon;
   final bool isSelected;
   final VoidCallback onTap;
+  final Color color;
 
   @override
   Widget build(BuildContext context) {
@@ -78,9 +87,7 @@ class PublishOption extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: isSelected
-                ? const Color(0xffE8A87C)
-                : const Color(0xffE5E2DC),
+            color: isSelected ? color : const Color(0xffE5E2DC),
             width: 1.5,
           ),
           color: Colors.white,
@@ -91,9 +98,7 @@ class PublishOption extends StatelessWidget {
             Icon(
               icon,
               size: 28,
-              color: isSelected
-                  ? const Color(0xffE8A87C)
-                  : const Color(0xffB5B0A8),
+              color: isSelected ? color : const Color(0xffB5B0A8),
             ),
 
             const SizedBox(height: 12),
@@ -104,7 +109,7 @@ class PublishOption extends StatelessWidget {
                 fontSize: 15,
                 fontFamily: "IBM Plex Sans",
                 fontWeight: FontWeight.w500,
-                color: isSelected ? const Color(0xffE8A87C) : Colors.black,
+                color: isSelected ? color : Colors.black,
               ),
             ),
           ],

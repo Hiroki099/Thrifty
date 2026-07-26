@@ -2,8 +2,10 @@ import 'dart:io';
 import 'package:dealura/features/home/model/category_model.dart';
 import 'package:dealura/features/home/repository/home_repository_impl.dart';
 import 'package:dealura/core/utls/app_router.dart';
+import 'package:dealura/features/publish/view/widgets/custom_publsih_textfield.dart';
 import 'package:dealura/features/publish/view/widgets/listing_type_widget.dart';
 import 'package:dealura/features/publish/view/widgets/publish_button.dart';
+import 'package:dealura/features/publish/view/widgets/publish_theme.dart';
 import 'package:dealura/features/publish/view/widgets/select_category_widget.dart';
 import 'package:dealura/features/publish/view/widgets/select_images_widget.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +20,9 @@ class PublishPage extends StatefulWidget {
 }
 
 class _PublishPageState extends State<PublishPage> {
+  final TextEditingController titleController = TextEditingController();
+  final TextEditingController priceController = TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
   @override
   void initState() {
     super.initState();
@@ -52,11 +57,12 @@ class _PublishPageState extends State<PublishPage> {
     });
   }
 
-  String selectedType = "Sale";
+  ListingType selectedType = ListingType.sale;
   List<File> images = [];
 
   @override
   Widget build(BuildContext context) {
+    final currentColor = PublishTheme.color(selectedType);
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -91,7 +97,14 @@ class _PublishPageState extends State<PublishPage> {
                 const SizedBox(height: 32),
 
                 /// Listing type
-                ListingTypeWidget(),
+                ListingTypeWidget(
+                  selectedType: selectedType,
+                  onChanged: (type) {
+                    setState(() {
+                      selectedType = type;
+                    });
+                  },
+                ),
 
                 const SizedBox(height: 28),
 
@@ -130,33 +143,45 @@ class _PublishPageState extends State<PublishPage> {
 
                 const SizedBox(height: 5),
 
-                textField(),
+                CustomPublishTextField(
+                  controller: titleController,
+                  color: currentColor,
+                ),
 
                 const SizedBox(height: 5),
 
                 /// Price
-                const Text(
-                  "Price (SYP)",
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontFamily: "IBM Plex Sans",
-                    fontWeight: FontWeight.w400,
+                if (selectedType != ListingType.donation) ...[
+                  Text(
+                    selectedType == ListingType.auction
+                        ? "Starting Price (SYP)"
+                        : "Price (SYP)",
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontFamily: "IBM Plex Sans",
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
-                ),
-
-                const SizedBox(height: 5),
-
-                textField(),
-
-                const SizedBox(height: 5),
+                  const SizedBox(height: 5),
+                  CustomPublishTextField(
+                    controller: priceController,
+                    color: currentColor,
+                  ),
+                  const SizedBox(height: 5),
+                ],
 
                 /// Category
-                SelectCateygoryWidget(
+                SelectCategoryWidget(
                   isLoadingCategories: isLoadingCategories,
                   selectedCategory: selectedCategory,
                   categories: categories,
+                  onCategorySelected: (category) {
+                    setState(() {
+                      selectedCategory = category;
+                    });
+                  },
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 5),
 
                 const Text(
                   "Description",
@@ -168,12 +193,15 @@ class _PublishPageState extends State<PublishPage> {
                 ),
                 const SizedBox(height: 5),
 
-                textField(),
+                CustomPublishTextField(
+                  controller: descriptionController,
+                  color: currentColor,
+                ),
 
                 const SizedBox(height: 30),
 
                 /// Button
-                PublishButton(),
+                PublishButton(onPressed: () {}, color: currentColor),
                 SizedBox(height: 47),
               ],
             ),
@@ -182,21 +210,4 @@ class _PublishPageState extends State<PublishPage> {
       ),
     );
   }
-}
-
-Widget textField() {
-  return Container(
-    height: 56,
-    decoration: BoxDecoration(
-      color: Color(0xffFFFFFF),
-      borderRadius: BorderRadius.circular(14),
-      border: Border.all(color: const Color(0xffE5E2DC)),
-    ),
-    child: const TextField(
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        contentPadding: EdgeInsets.symmetric(horizontal: 16),
-      ),
-    ),
-  );
 }

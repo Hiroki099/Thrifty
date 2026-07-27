@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:dealura/features/home/model/item_model.dart';
 
 abstract class PublishItemRepository {
-  Future<ItemModel> publishItem({
+  Future<ItemModel> publishFixedPrice({
     required String name,
     required String description,
-    double? price,
+    required double? price,
     required int categoryId,
     required List<File> images,
   });
@@ -14,7 +14,7 @@ abstract class PublishItemRepository {
   //   required int itemId,
   //   required String name,
   //   required String description,
-  //   double? price,
+  //   required double? price,
   //   required int categoryId,
   //   required List<File> images,
 

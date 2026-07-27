@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:dealura/features/home/model/category_model.dart';
 import 'package:dealura/features/home/repository/home_repository_impl.dart';
 import 'package:dealura/core/utls/app_router.dart';
+import 'package:dealura/features/publish/repository/publish_item_repository_impl.dart';
 import 'package:dealura/features/publish/view/widgets/custom_publsih_textfield.dart';
 import 'package:dealura/features/publish/view/widgets/listing_type_widget.dart';
 import 'package:dealura/features/publish/view/widgets/publish_button.dart';
@@ -20,6 +21,40 @@ class PublishPage extends StatefulWidget {
 }
 
 class _PublishPageState extends State<PublishPage> {
+  bool isPublishing = false;
+
+  bool validateFields() {
+    if (titleController.text.trim().isEmpty) return false;
+
+    if (descriptionController.text.trim().isEmpty) return false;
+
+    if (selectedCategory == null) return false;
+
+    if (images.isEmpty) return false;
+
+    if (selectedType != ListingType.donation) {
+      if (priceController.text.trim().isEmpty) return false;
+
+      if (double.tryParse(priceController.text.trim()) == null) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  void clearFields() {
+    titleController.clear();
+    priceController.clear();
+    descriptionController.clear();
+
+    setState(() {
+      images.clear();
+      selectedCategory = null;
+      selectedType = ListingType.sale;
+    });
+  }
+
   final TextEditingController titleController = TextEditingController();
   final TextEditingController priceController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
@@ -201,7 +236,73 @@ class _PublishPageState extends State<PublishPage> {
                 const SizedBox(height: 30),
 
                 /// Button
-                PublishButton(onPressed: () {}, color: currentColor),
+                PublishButton(
+                  onPressed: () async {
+                    if (!validateFields()) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Please fill in all required fields."),
+                        ),
+                      );
+                      return;
+                    }
+
+                    setState(() {
+                      isPublishing = true;
+                    });
+
+                    try {
+                      final repository = PublishRepositoryImpl();
+
+                      switch (selectedType) {
+                        case ListingType.sale:
+                          await repository.publishFixedPrice(
+                            name: titleController.text.trim(),
+                            description: descriptionController.text.trim(),
+                            price: double.parse(priceController.text),
+                            categoryId: selectedCategory!.id!,
+                            images: images,
+                          );
+                          break;
+
+                        case ListingType.donation:
+                          // publishDonation()
+                          break;
+
+                        case ListingType.auction:
+                          // publishAuction()
+                          break;
+                      }
+
+                      clearFields();
+
+                      if (!mounted) return;
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          backgroundColor: Colors.green,
+                          content: Text("Listing published successfully."),
+                        ),
+                      );
+                    } catch (e) {
+                      if (!mounted) return;
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          backgroundColor: Colors.red,
+                          content: Text("Failed to publish listing.\n$e"),
+                        ),
+                      );
+                    } finally {
+                      if (mounted) {
+                        setState(() {
+                          isPublishing = false;
+                        });
+                      }
+                    }
+                  },
+                  color: currentColor,
+                ),
                 SizedBox(height: 47),
               ],
             ),

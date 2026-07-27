@@ -9,10 +9,10 @@ class PublishRepositoryImpl implements PublishItemRepository {
   final ApiService api = ApiService();
 
   @override
-  Future<ItemModel> publishItem({
+  Future<ItemModel> publishFixedPrice({
     required String name,
     required String description,
-    double? price,
+    required double? price,
     required int categoryId,
     required List<File> images,
   }) async {
@@ -23,6 +23,8 @@ class PublishRepositoryImpl implements PublishItemRepository {
       "category": categoryId,
     });
 
+    print("=================== ${response.data}");
+    print("=================== ${response.data.runtimeType}");
     final item = ItemModel.fromJson(response.data);
 
     if (images.isNotEmpty) {
@@ -44,8 +46,15 @@ class PublishRepositoryImpl implements PublishItemRepository {
         );
       }).toList(),
     });
-
-    await api.post('items/$itemId/images/', formData, isMultipart: true);
+    print("===================================== ${formData.fields}");
+    print("===================================== ${formData.files}");
+    final response = await api.post(
+      'items/$itemId/images/',
+      formData,
+      isMultipart: true,
+    );
+    print("===================================== ${response.data}");
+    print("===================================== ${response.data.runtimeType}");
   }
 
   @override

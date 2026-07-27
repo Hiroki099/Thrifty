@@ -1,4 +1,3 @@
-
 import 'package:dealura/features/auth/model/user_model.dart';
 import 'package:dealura/features/home/model/category_model.dart';
 
@@ -36,11 +35,9 @@ class ItemModel {
     name: data['name'] as String?,
     listingType: data['listing_type'] as String?,
     price: data['price'] as String?,
-    category: data['category'] == null
-        ? null
-        : CategoryModel.fromPartialJson(
-            data['category'] as Map<String, dynamic>,
-          ),
+    category: data['category'] is Map<String, dynamic>
+        ? CategoryModel.fromPartialJson(data['category'])
+        : CategoryModel(id: data['category'] as int?),
     owner: data['owner'] == null
         ? null
         : UserModel.fromPartialJson(data['owner'] as Map<String, dynamic>),
@@ -55,6 +52,4 @@ class ItemModel {
     detailUrl: data['detail_url'] as String?,
     image: data['image'] as String?,
   );
-
-  
 }

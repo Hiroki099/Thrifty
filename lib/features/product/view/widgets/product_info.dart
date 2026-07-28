@@ -1,16 +1,17 @@
+import 'package:dealura/features/home/model/item_model.dart';
 import 'package:flutter/material.dart';
 
 class ProductInfo extends StatelessWidget {
-  const ProductInfo({super.key, required this.type});
-  final String type;
+  const ProductInfo({super.key, required this.product});
+  final ItemModel product;
   @override
   Widget build(BuildContext context) {
-    if (type == "Sale") {
+    if (product.listingType == "Sale") {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "MacBook Pro 14",
+            product.name!,
             style: const TextStyle(
               fontFamily: "IBM Plex Sans",
               fontSize: 18,
@@ -22,7 +23,7 @@ class ProductInfo extends StatelessWidget {
           const SizedBox(height: 8),
 
           Text(
-            "120,000 SYP",
+            "${product.price} SYP",
             style: const TextStyle(
               fontFamily: "IBM Plex Sans",
               fontSize: 20,
@@ -43,7 +44,7 @@ class ProductInfo extends StatelessWidget {
           ),
         ],
       );
-    } else if (type == 'Auction') {
+    } else if (product.listingType == 'Auction') {
       return Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -103,7 +104,7 @@ class ProductInfo extends StatelessWidget {
 
           SizedBox(height: 19),
           Text(
-            'Vintage  film camera collection',
+            product.name!,
             style: TextStyle(
               color: Colors.black,
               fontSize: 18,
@@ -119,7 +120,7 @@ class ProductInfo extends StatelessWidget {
             decoration: BoxDecoration(),
           ),
           Text(
-            'Current :12,000 SYP',
+            'Current :${product.price} SYP',
             style: TextStyle(
               color: const Color(0xFF8B7EC8),
               fontSize: 20,
@@ -155,7 +156,7 @@ class ProductInfo extends StatelessWidget {
                     ),
                   ),
                   TextSpan(
-                    text: '  Starting : 5,000 SYP',
+                    text: '  Starting : ${product.price} SYP',
                     style: TextStyle(
                       color: const Color(0xFFB5B0A8),
                       fontSize: 13,
@@ -209,7 +210,7 @@ class ProductInfo extends StatelessWidget {
                 SizedBox(
                   width: 280,
                   child: Text(
-                    'Children’s winter clothing bundle',
+                    product.name!,
                     style: TextStyle(
                       color: Colors.black,
                       fontSize: 18,
@@ -222,7 +223,7 @@ class ProductInfo extends StatelessWidget {
                 SizedBox(
                   width: 280,
                   child: Text(
-                    'Free',
+                    product.price == 0 ? 'Free' : '${product.price} SYP',
                     style: TextStyle(
                       color: const Color(0xFF5BAB8B),
                       fontSize: 20,

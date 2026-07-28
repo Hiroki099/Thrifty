@@ -150,7 +150,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       children: [
                         const SizedBox(height: 12),
 
-                        ProductInfo(type: _getType(product)),
+                        ProductInfo(product: product),
 
                         const SizedBox(height: 18),
 
@@ -161,7 +161,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         const SizedBox(height: 18),
 
                         ProductDescripion(
-                          // عدل الويدجت ليأخذ الوصف
+                          description: product.description ?? '',
                         ),
 
                         const SizedBox(height: 80),

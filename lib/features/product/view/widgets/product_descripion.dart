@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 class ProductDescripion extends StatelessWidget {
-  const ProductDescripion({super.key});
+  const ProductDescripion({super.key, required this.description});
 
+  final String description;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -20,7 +21,7 @@ class ProductDescripion extends StatelessWidget {
         ),
         const SizedBox(height: 11),
         Text(
-          "Excellent condition, barely used. Original box and charger included. Battery health 96%.",
+          description,
           style: const TextStyle(
             fontSize: 13,
             height: 1.85,

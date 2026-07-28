@@ -10,6 +10,22 @@ abstract class PublishItemRepository {
     required int categoryId,
     required List<File> images,
   });
+
+  Future<ItemModel> publishDonation({
+    required String name,
+    required String description,
+    required int categoryId,
+    required List<File> images,
+  });
+
+  Future<ItemModel> publishAuction({
+    required String name,
+    required String description,
+    required double startingPrice,
+    required DateTime endTime,
+    required int categoryId,
+    required List<File> images,
+  });
   // Future<ItemModel> updateItem({
   //   required int itemId,
   //   required String name,
@@ -18,7 +34,7 @@ abstract class PublishItemRepository {
   //   required int categoryId,
   //   required List<File> images,
 
-  Future<void> startAuction({
+  Future<Map<String, dynamic>> startAuction({
     required int itemId,
     required double startingPrice,
     required DateTime endTime,

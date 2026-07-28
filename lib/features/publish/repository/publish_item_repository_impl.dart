@@ -58,15 +58,75 @@ class PublishRepositoryImpl implements PublishItemRepository {
   }
 
   @override
-  Future<void> startAuction({
+  Future<Map<String, dynamic>> startAuction({
     required int itemId,
     required double startingPrice,
     required DateTime endTime,
   }) async {
-    await api.post('items/auctions/create/', {
+    final response = await api.post('items/auctions/create/', {
       "item": itemId,
-      "starting_price": startingPrice,
-      "end_time": endTime.toIso8601String(),
+      "start_price": startingPrice,
+      "end_time": endTime.subtract(Duration(hours: 3)).toIso8601String(),
     });
+    print("===================================== ${response.data}");
+    print("===================================== ${response.data.runtimeType}");
+    return response.data;
+  }
+
+  @override
+  Future<ItemModel> publishDonation({
+    required String name,
+    required String description,
+    required int categoryId,
+    required List<File> images,
+  }) async {
+    final response = await api.post('items/create/', {
+      "name": name,
+      "description": description,
+      "listing_type": "donation",
+      "category": categoryId,
+    });
+
+    print("=================== ${response.data}");
+    print("=================== ${response.data.runtimeType}");
+    final item = ItemModel.fromJson(response.data);
+
+    if (images.isNotEmpty) {
+      await _addItemPhotos(itemId: item.id!, images: images);
+    }
+
+    return item;
+  }
+
+  Future<ItemModel> publishAuction({
+    required String name,
+    required String description,
+    required double startingPrice,
+    required DateTime endTime,
+    required int categoryId,
+    required List<File> images,
+  }) async {
+    final response = await api.post('items/create/', {
+      "name": name,
+      "description": description,
+      "listing_type": "auction",
+      "category": categoryId,
+    });
+
+    print("=================== ${response.data}");
+    print("=================== ${response.data.runtimeType}");
+    final item = ItemModel.fromJson(response.data);
+
+    if (images.isNotEmpty) {
+      await _addItemPhotos(itemId: item.id!, images: images);
+    }
+
+    await startAuction(
+      itemId: item.id!,
+      startingPrice: startingPrice,
+      endTime: endTime,
+    );
+
+    return item;
   }
 }

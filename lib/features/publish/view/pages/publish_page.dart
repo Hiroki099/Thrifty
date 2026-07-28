@@ -21,9 +21,13 @@ class PublishPage extends StatefulWidget {
 }
 
 class _PublishPageState extends State<PublishPage> {
+  DateTime? auctionEndDateTime;
   bool isPublishing = false;
 
   bool validateFields() {
+    if (selectedType == ListingType.auction && auctionEndDateTime == null) {
+      return false;
+    }
     if (titleController.text.trim().isEmpty) return false;
 
     if (descriptionController.text.trim().isEmpty) return false;
@@ -52,6 +56,7 @@ class _PublishPageState extends State<PublishPage> {
       images.clear();
       selectedCategory = null;
       selectedType = ListingType.sale;
+      auctionEndDateTime = null;
     });
   }
 
@@ -94,6 +99,33 @@ class _PublishPageState extends State<PublishPage> {
 
   ListingType selectedType = ListingType.sale;
   List<File> images = [];
+  Future<void> pickAuctionDateTime() async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now().add(const Duration(days: 1)),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
+    );
+
+    if (pickedDate == null) return;
+
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+
+    if (pickedTime == null) return;
+
+    setState(() {
+      auctionEndDateTime = DateTime(
+        pickedDate.year,
+        pickedDate.month,
+        pickedDate.day,
+        pickedTime.hour,
+        pickedTime.minute,
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -204,6 +236,46 @@ class _PublishPageState extends State<PublishPage> {
                   ),
                   const SizedBox(height: 5),
                 ],
+                if (selectedType == ListingType.auction) ...[
+                  const SizedBox(height: 12),
+
+                  const Text(
+                    "Auction End",
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontFamily: "IBM Plex Sans",
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+
+                  const SizedBox(height: 5),
+
+                  GestureDetector(
+                    onTap: pickAuctionDateTime,
+                    child: Container(
+                      height: 56,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: currentColor, width: 1.5),
+                      ),
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        auctionEndDateTime == null
+                            ? "Select date & time"
+                            : "${auctionEndDateTime!.day}/${auctionEndDateTime!.month}/${auctionEndDateTime!.year}   ${auctionEndDateTime!.hour.toString().padLeft(2, '0')}:${auctionEndDateTime!.minute.toString().padLeft(2, '0')}",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: auctionEndDateTime == null
+                              ? Colors.grey
+                              : Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 5),
+                ],
 
                 /// Category
                 SelectCategoryWidget(
@@ -266,11 +338,23 @@ class _PublishPageState extends State<PublishPage> {
                           break;
 
                         case ListingType.donation:
-                          // publishDonation()
+                          await repository.publishDonation(
+                            name: titleController.text.trim(),
+                            description: descriptionController.text.trim(),
+                            categoryId: selectedCategory!.id!,
+                            images: images,
+                          );
                           break;
 
                         case ListingType.auction:
-                          // publishAuction()
+                          await repository.publishAuction(
+                            name: titleController.text.trim(),
+                            description: descriptionController.text.trim(),
+                            startingPrice: double.parse(priceController.text),
+                            endTime: auctionEndDateTime!,
+                            categoryId: selectedCategory!.id!,
+                            images: images,
+                          );
                           break;
                       }
 

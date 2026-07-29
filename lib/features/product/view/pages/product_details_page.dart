@@ -88,7 +88,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                               return productImage(product.image ?? '');
                             }
 
-                            return productImage(images[index].image ?? '');
+                            return productImage(images[index].imageUrl ?? '');
                           },
                         ),
 
@@ -225,7 +225,14 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   }
 }
 
-Widget productImage(String imageUrl) {
+Widget productImage(String? imageUrl) {
+  if (imageUrl == null || imageUrl.isEmpty) {
+    return Container(
+      color: Colors.grey.shade200,
+      child: const Center(child: Icon(Icons.image_not_supported)),
+    );
+  }
+
   return Container(
     width: double.infinity,
     decoration: BoxDecoration(

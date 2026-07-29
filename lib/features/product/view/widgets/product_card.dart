@@ -82,30 +82,6 @@ class ProductCard extends StatelessWidget {
                     ),
                   ),
                 ),
-
-                if (isAuction)
-                  Positioned(
-                    top: 10,
-                    right: 10,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xff6C63FF),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Text(
-                        "4h 20m",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ),
               ],
             ),
 
@@ -141,7 +117,7 @@ class ProductCard extends StatelessWidget {
                       isDonation
                           ? "Free"
                           : (item.price != null
-                                ? "${item.price} SYP"
+                                ? "${double.parse(item.price!).toInt()} SYP"
                                 : "Auction"),
                       style: TextStyle(
                         fontFamily: "IBM Plex Sans",

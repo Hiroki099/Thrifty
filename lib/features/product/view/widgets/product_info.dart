@@ -6,7 +6,7 @@ class ProductInfo extends StatelessWidget {
   final ItemModel product;
   @override
   Widget build(BuildContext context) {
-    if (product.listingType == "Sale") {
+    if (product.listingType == "fixed_price") {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -23,7 +23,7 @@ class ProductInfo extends StatelessWidget {
           const SizedBox(height: 8),
 
           Text(
-            "${product.price} SYP",
+            "${product.price!.toString()} SYP",
             style: const TextStyle(
               fontFamily: "IBM Plex Sans",
               fontSize: 20,
@@ -34,7 +34,7 @@ class ProductInfo extends StatelessWidget {
 
           const SizedBox(height: 6),
           Text(
-            "Damascus • 1h • 23 views",
+            '  Started : ${product.createdAt!.year.toString()}-${product.createdAt!.month.toString()}-${product.createdAt!.day.toString()}',
             style: const TextStyle(
               fontSize: 13,
               color: Color(0xffB5B0A8),
@@ -44,7 +44,7 @@ class ProductInfo extends StatelessWidget {
           ),
         ],
       );
-    } else if (product.listingType == 'Auction') {
+    } else if (product.listingType == 'auction') {
       return Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -136,27 +136,8 @@ class ProductInfo extends StatelessWidget {
               TextSpan(
                 children: [
                   TextSpan(
-                    text: 'Damascus  ',
-                    style: TextStyle(
-                      color: const Color(0xFFB5B0A8),
-                      fontSize: 13,
-                      fontFamily: 'IBM Plex Sans',
-                      fontWeight: FontWeight.w400,
-                      height: 1.04,
-                    ),
-                  ),
-                  TextSpan(
-                    text: '·',
-                    style: TextStyle(
-                      color: const Color(0xFFB5B0A8),
-                      fontSize: 13,
-                      fontFamily: 'IBM Plex Sans',
-                      fontWeight: FontWeight.w700,
-                      height: 1.04,
-                    ),
-                  ),
-                  TextSpan(
-                    text: '  Starting : ${product.price} SYP',
+                    text:
+                        '  Started : ${product.createdAt!.year.toString()}-${product.createdAt!.month.toString()}-${product.createdAt!.day.toString()}',
                     style: TextStyle(
                       color: const Color(0xFFB5B0A8),
                       fontSize: 13,
@@ -223,7 +204,7 @@ class ProductInfo extends StatelessWidget {
                 SizedBox(
                   width: 280,
                   child: Text(
-                    product.price == 0 ? 'Free' : '${product.price} SYP',
+                    product.price == null ? 'Free' : '${product.price} SYP',
                     style: TextStyle(
                       color: const Color(0xFF5BAB8B),
                       fontSize: 20,
@@ -236,7 +217,7 @@ class ProductInfo extends StatelessWidget {
                 SizedBox(
                   width: 280,
                   child: Text(
-                    'Damascus  ·  2 hours ago  ·  4 requests',
+                    '${product.createdAt!.year.toString()}-${product.createdAt!.month.toString()}-${product.createdAt!.day.toString()}',
                     style: TextStyle(
                       color: const Color(0xFFB5B0A8),
                       fontSize: 13,

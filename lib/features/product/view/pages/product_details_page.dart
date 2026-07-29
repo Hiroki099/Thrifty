@@ -1,4 +1,5 @@
 import 'package:dealura/features/home/model/item_model.dart';
+import 'package:dealura/features/product/models/RatingModel.dart';
 import 'package:dealura/features/product/models/image_model/image_model.dart';
 import 'package:dealura/features/product/repository/product_detailles_repository_impl.dart';
 import 'package:dealura/features/product/view/widgets/bottom_action.dart';
@@ -33,14 +34,17 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   Future<Map<String, dynamic>> loadData() async {
     final repo = ProductDetaillesRepositoryImpl();
 
+    final product = await repo.getProductDetailes(widget.id!);
+
     final results = await Future.wait([
-      repo.getProductDetailes(widget.id!),
       repo.getProductImages(widget.id!),
+      repo.getOwnerRating(product.owner!.id!),
     ]);
 
     return {
-      'product': results[0] as ItemModel,
-      'images': results[1] as List<ImageModel>,
+      'product': product,
+      'images': results[0] as List<ImageModel>,
+      'ratings': results[1] as List<RatingModel>,
     };
   }
 
@@ -61,6 +65,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
           final product = snapshot.data!['product'] as ItemModel;
           final images = snapshot.data!['images'] as List<ImageModel>;
+          final ratings = snapshot.data!['ratings'] as List<RatingModel>;
 
           return SafeArea(
             child: SingleChildScrollView(
@@ -151,11 +156,12 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         const SizedBox(height: 12),
 
                         ProductInfo(product: product),
-
                         const SizedBox(height: 18),
 
                         SellerInfo(
-                          // عدل الويدجت ليأخذ البيانات
+                          owner: product.owner!,
+                          averageRating: calculateAverageRating(ratings),
+                          ratingsCount: ratings.length,
                         ),
 
                         const SizedBox(height: 18),
@@ -226,4 +232,12 @@ Widget productImage(String imageUrl) {
       image: DecorationImage(image: NetworkImage(imageUrl), fit: BoxFit.cover),
     ),
   );
+}
+
+double calculateAverageRating(List<RatingModel> ratings) {
+  if (ratings.isEmpty) return 0;
+
+  final total = ratings.fold<int>(0, (sum, r) => sum + (r.rating ?? 0));
+
+  return total / ratings.length;
 }

@@ -1,5 +1,6 @@
 import 'package:dealura/features/home/model/item_model.dart';
 import 'package:dealura/features/product/models/RatingModel.dart';
+import 'package:dealura/features/product/models/auction_model.dart';
 import 'package:dealura/features/product/models/image_model/image_model.dart';
 import 'package:dealura/features/product/repository/product_detailles_repository_impl.dart';
 import 'package:dealura/features/product/view/widgets/bottom_action.dart';
@@ -10,6 +11,7 @@ import 'package:dealura/features/product/view/widgets/product_tag.dart';
 import 'package:dealura/features/product/view/widgets/seller_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'dart:async';
 
 class ProductDetailsPage extends StatefulWidget {
   const ProductDetailsPage({super.key, required this.id});
@@ -21,6 +23,16 @@ class ProductDetailsPage extends StatefulWidget {
 }
 
 class _ProductDetailsPageState extends State<ProductDetailsPage> {
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
+  Timer? timer;
+
+  Duration remaining = Duration.zero;
+  bool auctionEnded = false;
   int currentPage = 0;
 
   late Future<Map<String, dynamic>> pageData;
@@ -31,10 +43,66 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     pageData = loadData();
   }
 
+  void startTimer(DateTime endTime) {
+    timer?.cancel();
+
+    remaining = endTime.difference(DateTime.now());
+
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+      if (!mounted) return;
+
+      final diff = endTime.difference(DateTime.now());
+
+      if (diff.isNegative || diff == Duration.zero) {
+        timer.cancel();
+
+        setState(() {
+          remaining = Duration.zero;
+          auctionEnded = true;
+        });
+
+        timer.cancel();
+
+        setState(() {
+          remaining = Duration.zero;
+          auctionEnded = true;
+        });
+
+        final data = await loadData();
+
+        if (!mounted) return;
+
+        setState(() {
+          pageData = Future.value(data);
+        });
+        return;
+      }
+
+      setState(() {
+        remaining = diff;
+      });
+    });
+  }
+
   Future<Map<String, dynamic>> loadData() async {
     final repo = ProductDetaillesRepositoryImpl();
 
     final product = await repo.getProductDetailes(widget.id!);
+
+    AuctionModel? auction;
+
+    if (product.listingType == "auction") {
+      auction = await repo.getAuctionDetails(widget.id!);
+      if (auction.endTime != null) {
+        if (auction.endTime!.isAfter(DateTime.now())) {
+          auctionEnded = false;
+          startTimer(auction.endTime!);
+        } else {
+          auctionEnded = true;
+          remaining = Duration.zero;
+        }
+      }
+    }
 
     final results = await Future.wait([
       repo.getProductImages(widget.id!),
@@ -45,6 +113,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       'product': product,
       'images': results[0] as List<ImageModel>,
       'ratings': results[1] as List<RatingModel>,
+      'auction': auction,
     };
   }
 
@@ -66,6 +135,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           final product = snapshot.data!['product'] as ItemModel;
           final images = snapshot.data!['images'] as List<ImageModel>;
           final ratings = snapshot.data!['ratings'] as List<RatingModel>;
+          final auction = snapshot.data!['auction'] as AuctionModel?;
 
           return SafeArea(
             child: SingleChildScrollView(
@@ -154,8 +224,12 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 12),
-
-                        ProductInfo(product: product),
+                        ProductInfo(
+                          product: product,
+                          auction: auction,
+                          remaining: remaining,
+                          auctionEnded: auctionEnded,
+                        ),
                         const SizedBox(height: 18),
 
                         SellerInfo(

@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum ListingType {
-  sale,
-  donation,
-  auction,
-}
+enum ListingType { sale, donation, auction }
 
 class PublishTheme {
   static Color color(ListingType type) {

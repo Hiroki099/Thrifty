@@ -28,7 +28,7 @@ class SearchRepositoryImpl implements SearchRepository {
       final data = await ApiService().get(
         endpoint: 'items/list/',
         queryParameters: {
-          // 'available': true,
+          'available': true,
           'category': ?categoryId,
           'type': ?listringType,
           'recommended': ?isRecommended,

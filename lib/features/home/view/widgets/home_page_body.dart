@@ -48,7 +48,7 @@ class _HomePageBodyState extends State<HomePageBody> {
       isLoading = true;
     });
 
-    items = await repository.getItemsList(categoryId, null, null);
+    items = await repository.getItemsList(categoryId, null, true);
 
     setState(() {
       isLoading = false;

@@ -1,9 +1,19 @@
 import 'package:dealura/features/home/model/item_model.dart';
+import 'package:dealura/features/product/models/auction_model.dart';
 import 'package:flutter/material.dart';
 
 class ProductInfo extends StatelessWidget {
-  const ProductInfo({super.key, required this.product});
   final ItemModel product;
+  final AuctionModel? auction;
+  final Duration remaining;
+  final bool auctionEnded;
+  const ProductInfo({
+    super.key,
+    required this.product,
+    this.auction,
+    required this.remaining,
+    required this.auctionEnded,
+  });
   @override
   Widget build(BuildContext context) {
     if (product.listingType == "fixed_price") {
@@ -45,6 +55,10 @@ class ProductInfo extends StatelessWidget {
         ],
       );
     } else if (product.listingType == 'auction') {
+      final hours = remaining.inHours;
+      final minutes = remaining.inMinutes.remainder(60);
+      final seconds = remaining.inSeconds.remainder(60);
+
       return Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -76,7 +90,9 @@ class ProductInfo extends StatelessWidget {
                       ),
                       SizedBox(width: 12),
                       Text(
-                        '4h 20m left ',
+                        auctionEnded
+                            ? "Auction ended"
+                            : "$hours h $minutes m $seconds s",
                         style: TextStyle(
                           color: const Color(0xFF8B7EC8),
                           fontSize: 15,
@@ -86,16 +102,6 @@ class ProductInfo extends StatelessWidget {
                         ),
                       ),
                     ],
-                  ),
-                  Text(
-                    '12 bids',
-                    style: TextStyle(
-                      color: const Color(0xFF8B7EC8),
-                      fontSize: 15,
-                      fontFamily: 'IBM Plex Sans',
-                      fontWeight: FontWeight.w700,
-                      height: 0.90,
-                    ),
                   ),
                 ],
               ),
@@ -120,7 +126,7 @@ class ProductInfo extends StatelessWidget {
             decoration: BoxDecoration(),
           ),
           Text(
-            'Current :${product.price} SYP',
+            'Current : ${auction?.currentPrice ?? auction?.startPrice ?? "0"} SYP',
             style: TextStyle(
               color: const Color(0xFF8B7EC8),
               fontSize: 20,

@@ -25,7 +25,8 @@ class SearchHeader extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: TextFormField(onChanged: onSearch,
+              child: TextFormField(
+                onChanged: onSearch,
                 style: TextStyle(
                   color: const Color(0xff1A1A1A),
                   fontFamily: "IBM Plex Sans",

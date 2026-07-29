@@ -45,7 +45,8 @@ class ImagePickerGrid extends StatelessWidget {
                   top: 4,
                   right: 4,
                   child: GestureDetector(
-                    onTap: () => onRemovePressed(image),    child: Container(
+                    onTap: () => onRemovePressed(image),
+                    child: Container(
                       padding: const EdgeInsets.all(4),
                       decoration: const BoxDecoration(
                         color: Colors.black54,
@@ -64,15 +65,13 @@ class ImagePickerGrid extends StatelessWidget {
           ),
           if (images.length < 5)
             GestureDetector(
-              onTap: onAddPressed, 
+              onTap: onAddPressed,
               child: Container(
                 width: 95,
                 height: 95,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: const Color(0xffE5E2DC),
-                  ),
+                  border: Border.all(color: const Color(0xffE5E2DC)),
                   color: Colors.white,
                 ),
                 child: const Icon(

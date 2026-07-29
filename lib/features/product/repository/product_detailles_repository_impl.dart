@@ -1,6 +1,7 @@
 import 'package:dealura/core/utls/api_service.dart';
 import 'package:dealura/features/home/model/item_model.dart';
 import 'package:dealura/features/product/models/RatingModel.dart';
+import 'package:dealura/features/product/models/auction_model.dart';
 import 'package:dealura/features/product/models/image_model/image_model.dart';
 import 'package:dealura/features/product/repository/product_detailes_repository.dart';
 
@@ -19,18 +20,21 @@ class ProductDetaillesRepositoryImpl implements ProductDetailesRepository {
     return (data as List).map((item) => ImageModel.fromMap(item)).toList();
   }
 
+  @override
+  Future<List<RatingModel>> getOwnerRating(int ownerId) async {
+    final api = ApiService();
 
-  
- @override
-Future<List<RatingModel>> getOwnerRating(int ownerId) async {
-  final api = ApiService();
+    final data = await api.get(endpoint: 'ratings/seller/$ownerId/ratings/');
 
-  final data = await api.get(
-    endpoint: 'ratings/seller/$ownerId/ratings/',
-  );
+    return (data as List).map((e) => RatingModel.fromJson(e)).toList();
+  }
 
-  return (data as List)
-      .map((e) => RatingModel.fromJson(e))
-      .toList();
-}
+  @override
+  Future<AuctionModel> getAuctionDetails(int productId)async{
+    final api = ApiService();
+
+    return await api.get(endpoint: 'items/$productId/auction/').then((data) {
+      return AuctionModel.fromJson(data);
+    });
+  }
 }

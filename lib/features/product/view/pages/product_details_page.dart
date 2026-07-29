@@ -1,3 +1,4 @@
+import 'package:dealura/features/auth/model/user_model.dart';
 import 'package:dealura/features/home/model/item_model.dart';
 import 'package:dealura/features/product/models/RatingModel.dart';
 import 'package:dealura/features/product/models/auction_model.dart';
@@ -9,6 +10,7 @@ import 'package:dealura/features/product/view/widgets/product_descripion.dart';
 import 'package:dealura/features/product/view/widgets/product_info.dart';
 import 'package:dealura/features/product/view/widgets/product_tag.dart';
 import 'package:dealura/features/product/view/widgets/seller_info.dart';
+import 'package:dealura/features/profile/repository/profile_repository_impl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'dart:async';
@@ -86,9 +88,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
   Future<Map<String, dynamic>> loadData() async {
     final repo = ProductDetaillesRepositoryImpl();
-
+    final prepo = ProfileRepositoryImpl();
     final product = await repo.getProductDetailes(widget.id!);
-
+    final me = await prepo.getMyProfile();
     AuctionModel? auction;
 
     if (product.listingType == "auction") {
@@ -108,12 +110,12 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
       repo.getProductImages(widget.id!),
       repo.getOwnerRating(product.owner!.id!),
     ]);
-
     return {
       'product': product,
       'images': results[0] as List<ImageModel>,
       'ratings': results[1] as List<RatingModel>,
       'auction': auction,
+      'me': me,
     };
   }
 
@@ -136,6 +138,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           final images = snapshot.data!['images'] as List<ImageModel>;
           final ratings = snapshot.data!['ratings'] as List<RatingModel>;
           final auction = snapshot.data!['auction'] as AuctionModel?;
+          final me = snapshot.data!['me'] as UserModel;
+
+          final isMyProduct = product.owner?.id == me.id;
 
           return SafeArea(
             child: SingleChildScrollView(
@@ -246,7 +251,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
                         const SizedBox(height: 80),
 
-                        bottomAction(_getActionText(product)),
+                        bottomAction(
+                          text: _getActionText(product),
+                          isMyProduct: isMyProduct,
+                        ),
                       ],
                     ),
                   ),

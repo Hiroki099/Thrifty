@@ -1,6 +1,52 @@
 import 'package:flutter/material.dart';
 
-Widget bottomAction(String text) {
+Widget bottomAction({required String text, required bool isMyProduct}) {
+  if (isMyProduct) {
+    Color color;
+
+    switch (text) {
+      case "Buy now":
+        color = const Color(0xffE8A87C); // Sale
+        break;
+
+      case "Place bid":
+        color = const Color(0xFF8B7EC8); // Auction
+        break;
+
+      default:
+        color = const Color(0xff5BAB8B); // Donation
+    }
+
+    return Container(
+      decoration: const BoxDecoration(color: Color(0xffFBF8F2)),
+      child: SizedBox(
+        height: 53,
+        width: double.infinity,
+        child: ElevatedButton.icon(
+          onPressed: () {
+            // Edit Product
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: color,
+            foregroundColor: Colors.white,
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          icon: const Icon(Icons.edit_outlined),
+          label: const Text(
+            "Edit Product",
+            style: TextStyle(
+              fontFamily: "IBM Plex Sans",
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
   if (text == "Buy now") {
     return Container(
       decoration: const BoxDecoration(color: Color(0xffFBF8F2)),

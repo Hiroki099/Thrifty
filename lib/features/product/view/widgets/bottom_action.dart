@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
-Widget bottomAction({required String text, required bool isMyProduct}) {
+Widget bottomAction({
+  required String text,
+  required bool isMyProduct,
+  VoidCallback? onEdit,
+}) {
   if (isMyProduct) {
     Color color;
 
@@ -23,9 +27,7 @@ Widget bottomAction({required String text, required bool isMyProduct}) {
         height: 53,
         width: double.infinity,
         child: ElevatedButton.icon(
-          onPressed: () {
-            // Edit Product
-          },
+          onPressed: onEdit,
           style: ElevatedButton.styleFrom(
             backgroundColor: color,
             foregroundColor: Colors.white,

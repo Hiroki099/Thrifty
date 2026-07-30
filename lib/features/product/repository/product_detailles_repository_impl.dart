@@ -53,4 +53,36 @@ class ProductDetaillesRepositoryImpl implements ProductDetailesRepository {
     });
     return RequestModel.fromJson(response.data);
   }
+
+  @override
+  Future<Map<String, dynamic>> purchaseItem(int productId) async {
+    final api = ApiService();
+    final response = await api.post('items/$productId/purchase/', {});
+    return response.data as Map<String, dynamic>;
+  }
+
+  @override
+  Future<void> updateProductDetails(
+    int productId,
+    Map<String, dynamic> updatedData,
+  ) async {
+    final api = ApiService();
+    return await api.patch('items/$productId/update/', updatedData);
+  }
+
+  @override
+  Future<void> deleteProduct(int productId) async {
+    final api = ApiService();
+    return await api.delete('items/$productId/delete/');
+  }
+
+  @override
+  Future<Map<String, dynamic>> createBid(int auctionId, int amount) async {
+    final api = ApiService();
+    final response = await api.post('items/bids/create/', {
+      'bid_amount': amount,
+      'auction': auctionId,
+    });
+    return response.data as Map<String, dynamic>;
+  }
 }

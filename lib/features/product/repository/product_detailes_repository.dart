@@ -11,4 +11,11 @@ abstract class ProductDetailesRepository {
   Future<List<RatingModel>> getOwnerRating(int ownerId);
   Future<RequestModel> requestForDonation(int productId);
   Future<void> cancelRequest(int requestId);
+  Future<Map<String, dynamic>> purchaseItem(int productId);
+  Future<void> updateProductDetails(
+    int productId,
+    Map<String, dynamic> updatedData,
+  );
+  Future<void> deleteProduct(int productId);
+  Future<Map<String, dynamic>> createBid(int productId, int amount);
 }

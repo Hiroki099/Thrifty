@@ -59,7 +59,7 @@ class SellerInfo extends StatelessWidget {
                 children: [
                   StarRating(rating: averageRating),
                   Text(
-                    "${averageRating.toStringAsFixed(1)} (${ratingsCount})",
+                    "${averageRating.toStringAsFixed(1)} ($ratingsCount)",
                     style: const TextStyle(
                       fontSize: 13,
                       color: Color(0xff8A8580),

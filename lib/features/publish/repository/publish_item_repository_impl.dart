@@ -98,6 +98,7 @@ class PublishRepositoryImpl implements PublishItemRepository {
     return item;
   }
 
+  @override
   Future<ItemModel> publishAuction({
     required String name,
     required String description,

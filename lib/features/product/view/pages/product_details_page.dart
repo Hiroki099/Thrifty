@@ -6,6 +6,7 @@ import 'package:dealura/features/product/models/image_model/image_model.dart';
 import 'package:dealura/features/product/repository/product_detailles_repository_impl.dart';
 import 'package:dealura/features/product/view/widgets/bottom_action.dart';
 import 'package:dealura/features/product/view/widgets/custom_photo_dots.dart';
+import 'package:dealura/features/product/view/widgets/edit_product_bottomsheet.dart';
 import 'package:dealura/features/product/view/widgets/product_descripion.dart';
 import 'package:dealura/features/product/view/widgets/product_info.dart';
 import 'package:dealura/features/product/view/widgets/product_tag.dart';
@@ -25,6 +26,36 @@ class ProductDetailsPage extends StatefulWidget {
 }
 
 class _ProductDetailsPageState extends State<ProductDetailsPage> {
+  Future<void> _showEditBottomSheet(ItemModel product) async {
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: const Color(0xffFBF8F2),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (_) {
+        return EditProductBottomSheet(
+          product: product,
+          onSave: (body) async {
+            await ProductDetaillesRepositoryImpl().updateProductDetails(
+              product.id!,
+              body,
+            );
+
+            final data = await loadData();
+
+            if (!mounted) return;
+
+            setState(() {
+              pageData = Future.value(data);
+            });
+          },
+        );
+      },
+    );
+  }
+
   @override
   void dispose() {
     timer?.cancel();
@@ -254,6 +285,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         bottomAction(
                           text: _getActionText(product),
                           isMyProduct: isMyProduct,
+                          onEdit: () {
+                            _showEditBottomSheet(product);
+                          },
                         ),
                       ],
                     ),

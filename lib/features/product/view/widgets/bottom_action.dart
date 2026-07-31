@@ -2,7 +2,17 @@ import 'package:flutter/material.dart';
 
 Widget bottomAction({
   required String text,
+
   required bool isMyProduct,
+
+  bool isRequested = false,
+
+  bool isLoading = false,
+
+  bool isCheckingRequest = false,
+
+  VoidCallback? onRequest,
+
   VoidCallback? onEdit,
 }) {
   if (isMyProduct) {
@@ -168,22 +178,36 @@ Widget bottomAction({
       child: Row(
         children: [
           Expanded(
-            child: Container(
-              height: 51,
-              width: 293,
-              decoration: BoxDecoration(
-                color: const Color(0xff5BAB8B),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                "Request this item",
-                style: const TextStyle(
-                  color: Color(0xffFFFFFF),
-                  fontSize: 20,
-                  fontFamily: "IBM Plex Sans",
-                  fontWeight: FontWeight.w600,
+            child: GestureDetector(
+              onTap: isCheckingRequest || isLoading ? null : onRequest,
+              child: Container(
+                height: 51,
+                width: 293,
+                decoration: BoxDecoration(
+                  color: const Color(0xff5BAB8B),
+                  borderRadius: BorderRadius.circular(12),
                 ),
+                alignment: Alignment.center,
+
+                child: isCheckingRequest || isLoading
+                    ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : Text(
+                        isRequested ? "Cancel request" : "Request this item",
+
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontFamily: "IBM Plex Sans",
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
               ),
             ),
           ),

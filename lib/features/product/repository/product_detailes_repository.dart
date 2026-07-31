@@ -16,6 +16,7 @@ abstract class ProductDetailesRepository {
     int productId,
     Map<String, dynamic> updatedData,
   );
+  Future<List<RequestModel>> getRequests(String typeFillter);
   Future<void> deleteProduct(int productId);
   Future<Map<String, dynamic>> createBid(int productId, int amount);
 }

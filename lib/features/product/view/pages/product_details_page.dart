@@ -26,6 +26,85 @@ class ProductDetailsPage extends StatefulWidget {
 }
 
 class _ProductDetailsPageState extends State<ProductDetailsPage> {
+  bool isRequested = false;
+  bool requestLoading = false;
+  bool checkingRequest = false;
+  int? requestId;
+  bool checkedRequest = false;
+  Future<void> handleDonationRequest(ItemModel product) async {
+    final repo = ProductDetaillesRepositoryImpl();
+
+    setState(() {
+      requestLoading = true;
+    });
+
+    try {
+      if (isRequested) {
+        await repo.cancelRequest(requestId!);
+
+        setState(() {
+          isRequested = false;
+          requestId = null;
+        });
+      } else {
+        final request = await repo.requestForDonation(product.id!);
+
+        setState(() {
+          isRequested = true;
+          requestId = request.id;
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          requestLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> checkDonationRequest(ItemModel product) async {
+    setState(() {
+      checkingRequest = true;
+    });
+
+    try {
+      final repo = ProductDetaillesRepositoryImpl();
+
+      final requests = await repo.getRequests("sent");
+
+      for (final request in requests) {
+        if (request.itemId == product.id) {
+          if (!mounted) return;
+
+          if (request.itemId == product.id) {
+            if (!mounted) return;
+
+            setState(() {
+              isRequested = true;
+              requestId = request.id;
+            });
+
+            return;
+          }
+        }
+      }
+
+      if (!mounted) return;
+
+      setState(() {
+        isRequested = false;
+        requestId = null;
+      });
+    } finally {
+      if (mounted) {
+        setState(() {
+          checkingRequest = false;
+        });
+      }
+    }
+  }
+
   Future<void> _showEditBottomSheet(ItemModel product) async {
     await showModalBottomSheet(
       context: context,
@@ -173,6 +252,16 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
           final isMyProduct = product.owner?.id == me.id;
 
+          if (product.listingType == "donation" &&
+              !isMyProduct &&
+              !checkedRequest) {
+            checkedRequest = true;
+
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              checkDonationRequest(product);
+            });
+          }
+
           return SafeArea(
             child: SingleChildScrollView(
               child: Column(
@@ -285,6 +374,17 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         bottomAction(
                           text: _getActionText(product),
                           isMyProduct: isMyProduct,
+
+                          isRequested: isRequested,
+
+                          isLoading: requestLoading,
+
+                          isCheckingRequest: checkingRequest,
+
+                          onRequest: () {
+                            handleDonationRequest(product);
+                          },
+
                           onEdit: () {
                             _showEditBottomSheet(product);
                           },

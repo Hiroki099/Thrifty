@@ -51,7 +51,7 @@ class ProductDetaillesRepositoryImpl implements ProductDetailesRepository {
     final response = await api.post('items/request/create/', {
       "item": productId,
     });
-    return RequestModel.fromJson(response.data);
+    return RequestModel.fromPartialJson(response.data);
   }
 
   @override
@@ -84,5 +84,20 @@ class ProductDetaillesRepositoryImpl implements ProductDetailesRepository {
       'auction': auctionId,
     });
     return response.data as Map<String, dynamic>;
+  }
+
+  @override
+  Future<List<RequestModel>> getRequests(String typeFillter) {
+    final api = ApiService();
+    return api
+        .get(
+          endpoint: 'items/requests/',
+          queryParameters: {'type': typeFillter},
+        )
+        .then(
+          (data) => (data as List)
+              .map((item) => RequestModel.fromJson(item))
+              .toList(),
+        );
   }
 }

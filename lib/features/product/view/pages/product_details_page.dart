@@ -33,6 +33,73 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   int? requestId;
   bool checkedRequest = false;
   bool purchaseLoading = false;
+  final TextEditingController bidController = TextEditingController();
+  Future<void> handleBid(AuctionModel auction, int amount) async {
+    final repo = ProductDetaillesRepositoryImpl();
+
+    try {
+      print("Auction ID: ${auction.id}");
+      print("Amount: $amount");
+      await repo.createBid(auction.id!, amount);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Bid placed successfully"),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      final data = await loadData();
+
+      if (!mounted) return;
+
+      setState(() {
+        pageData = Future.value(data);
+      });
+    } on DioException catch (e) {
+      print("STATUS CODE: ${e.response?.statusCode}");
+      print("ERROR DATA: ${e.response?.data}");
+      print("REQUEST DATA: ${e.requestOptions.data}");
+      print("REQUEST URL: ${e.requestOptions.uri}");
+
+      String message = "Failed to place bid";
+
+      final data = e.response?.data;
+
+      if (data is Map<String, dynamic>) {
+        final bidError = data["bid_amount"];
+        final auctionError = data["auction"];
+
+        if (bidError is List && bidError.isNotEmpty) {
+          final error = bidError.first.toString();
+
+          if (error.contains("Insufficient wallet balance")) {
+            message = "Sorry, you don't have enough balance.";
+          } else if (error.contains("higher than the current price")) {
+            message = "Your bid must be higher than the current bid.";
+          } else {
+            message = error;
+          }
+        } else if (auctionError is List && auctionError.isNotEmpty) {
+          final error = auctionError.first.toString();
+
+          if (error.contains("auction has ended")) {
+            message = "Sorry, this auction has already ended.";
+          } else {
+            message = error;
+          }
+        }
+      }
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
+    }
+  }
 
   Future<void> handlePurchase(ItemModel product) async {
     final repo = ProductDetaillesRepositoryImpl();
@@ -226,6 +293,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   void dispose() {
     timer?.cancel();
     super.dispose();
+    bidController.dispose();
   }
 
   Timer? timer;
@@ -459,6 +527,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         const SizedBox(height: 80),
 
                         bottomAction(
+                          context: context,
                           text: _getActionText(product),
                           isMyProduct: isMyProduct,
                           isRequested: isRequested,
@@ -475,6 +544,12 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           onEdit: () {
                             _showEditBottomSheet(product);
                           },
+                          onBid: auction == null
+                              ? null
+                              : (amount) {
+                                  handleBid(auction, amount);
+                                },
+                          bidController: bidController,
                         ),
                       ],
                     ),

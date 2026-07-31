@@ -11,6 +11,9 @@ Widget bottomAction({
   VoidCallback? onPurchase,
   VoidCallback? onRequest,
   VoidCallback? onEdit,
+  ValueChanged<int>? onBid,
+  required BuildContext context,
+  TextEditingController? bidController,
 }) {
   if (isMyProduct) {
     Color color;
@@ -126,6 +129,7 @@ Widget bottomAction({
               border: Border.all(color: const Color(0xFF8B7EC8), width: 1.5),
             ),
             child: TextField(
+              controller: bidController,
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(
                 hintText: "Enter bid",
@@ -144,24 +148,38 @@ Widget bottomAction({
               ),
             ),
           ),
-          Container(
-            width: 129,
-            height: 53,
-            decoration: ShapeDecoration(
-              color: const Color(0xFF8B7EC8),
-              shape: RoundedRectangleBorder(
-                side: BorderSide(width: 1.50, color: const Color(0xFF8B7EC8)),
-                borderRadius: BorderRadius.circular(10),
+          GestureDetector(
+            onTap: () {
+              final amount = int.tryParse(bidController!.text);
+
+              if (amount == null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Enter a valid amount")),
+                );
+                return;
+              }
+
+              onBid?.call(amount);
+            },
+            child: Container(
+              width: 129,
+              height: 53,
+              decoration: ShapeDecoration(
+                color: const Color(0xFF8B7EC8),
+                shape: RoundedRectangleBorder(
+                  side: BorderSide(width: 1.50, color: const Color(0xFF8B7EC8)),
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
-            ),
-            child: Center(
-              child: Text(
-                text,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 17,
-                  fontFamily: "IBM Plex Sans",
-                  fontWeight: FontWeight.w600,
+              child: Center(
+                child: Text(
+                  text,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 17,
+                    fontFamily: "IBM Plex Sans",
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ),

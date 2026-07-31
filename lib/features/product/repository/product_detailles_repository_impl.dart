@@ -2,6 +2,7 @@ import 'package:dealura/core/utls/api_service.dart';
 import 'package:dealura/features/home/model/item_model.dart';
 import 'package:dealura/features/product/models/RatingModel.dart';
 import 'package:dealura/features/product/models/auction_model.dart';
+import 'package:dealura/features/product/models/bid_model.dart';
 import 'package:dealura/features/product/models/image_model/image_model.dart';
 import 'package:dealura/features/product/models/request_model.dart';
 import 'package:dealura/features/product/repository/product_detailes_repository.dart';
@@ -77,13 +78,13 @@ class ProductDetaillesRepositoryImpl implements ProductDetailesRepository {
   }
 
   @override
-  Future<Map<String, dynamic>> createBid(int auctionId, int amount) async {
+  Future<BidModel> createBid(int auctionId, int amount) async {
     final api = ApiService();
     final response = await api.post('items/bids/create/', {
       'bid_amount': amount,
       'auction': auctionId,
     });
-    return response.data as Map<String, dynamic>;
+    return BidModel.fromJson(response.data as Map<String, dynamic>);
   }
 
   @override

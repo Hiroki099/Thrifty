@@ -1,6 +1,7 @@
 import 'package:dealura/features/home/model/item_model.dart';
 import 'package:dealura/features/product/models/RatingModel.dart';
 import 'package:dealura/features/product/models/auction_model.dart';
+import 'package:dealura/features/product/models/bid_model.dart';
 import 'package:dealura/features/product/models/image_model/image_model.dart';
 import 'package:dealura/features/product/models/request_model.dart';
 
@@ -18,5 +19,5 @@ abstract class ProductDetailesRepository {
   );
   Future<List<RequestModel>> getRequests(String typeFillter);
   Future<void> deleteProduct(int productId);
-  Future<Map<String, dynamic>> createBid(int productId, int amount);
+  Future<BidModel> createBid(int productId, int amount);
 }

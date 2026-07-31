@@ -2,17 +2,14 @@ import 'package:flutter/material.dart';
 
 Widget bottomAction({
   required String text,
-
   required bool isMyProduct,
-
   bool isRequested = false,
-
   bool isLoading = false,
-
   bool isCheckingRequest = false,
-
+  bool isAvailable = true,
+  bool purchaseLoading = false,
+  VoidCallback? onPurchase,
   VoidCallback? onRequest,
-
   VoidCallback? onEdit,
 }) {
   if (isMyProduct) {
@@ -65,22 +62,34 @@ Widget bottomAction({
       child: Row(
         children: [
           Expanded(
-            child: Container(
-              height: 51,
-              width: 293,
-              decoration: BoxDecoration(
-                color: const Color(0xffE8A87C),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                text,
-                style: const TextStyle(
-                  color: Color(0xffFFFFFF),
-                  fontSize: 20,
-                  fontFamily: "IBM Plex Sans",
-                  fontWeight: FontWeight.w600,
+            child: GestureDetector(
+              onTap: (!isAvailable || purchaseLoading) ? null : onPurchase,
+              child: Container(
+                height: 51,
+                width: 293,
+                decoration: BoxDecoration(
+                  color: isAvailable ? const Color(0xffE8A87C) : Colors.grey,
+                  borderRadius: BorderRadius.circular(12),
                 ),
+                alignment: Alignment.center,
+                child: purchaseLoading
+                    ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : Text(
+                        isAvailable ? text : "Sold",
+                        style: const TextStyle(
+                          color: Color(0xffFFFFFF),
+                          fontSize: 20,
+                          fontFamily: "IBM Plex Sans",
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
               ),
             ),
           ),

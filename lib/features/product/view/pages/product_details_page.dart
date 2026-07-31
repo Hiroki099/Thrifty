@@ -12,6 +12,7 @@ import 'package:dealura/features/product/view/widgets/product_info.dart';
 import 'package:dealura/features/product/view/widgets/product_tag.dart';
 import 'package:dealura/features/product/view/widgets/seller_info.dart';
 import 'package:dealura/features/profile/repository/profile_repository_impl.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'dart:async';
@@ -31,6 +32,92 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   bool checkingRequest = false;
   int? requestId;
   bool checkedRequest = false;
+  bool purchaseLoading = false;
+
+  Future<void> handlePurchase(ItemModel product) async {
+    final repo = ProductDetaillesRepositoryImpl();
+
+    setState(() {
+      purchaseLoading = true;
+    });
+
+    try {
+      final result = await repo.purchaseItem(product.id!);
+
+      if (result.containsKey('error')) {
+        String message;
+
+        switch (result['error']) {
+          case 'Insufficient buyer wallet balance':
+            message = 'sorry you do not have enough balance';
+            break;
+
+          case 'Item is not available.':
+            message = 'sorry this item is no longer available';
+            break;
+
+          default:
+            message = result['error'];
+        }
+
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(message)));
+        return;
+      }
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result["message"]),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      final data = await loadData();
+
+      if (!mounted) return;
+
+      setState(() {
+        pageData = Future.value(data);
+      });
+    } on DioException catch (e) {
+      String message = "Purchase failed";
+
+      final data = e.response?.data;
+
+      if (data is Map<String, dynamic>) {
+        switch (data["error"]) {
+          case "Insufficient buyer wallet balance":
+            message = "sorry you do not have enough balance";
+            break;
+
+          case "Item is not available.":
+            message = "sorry this item is no longer available";
+            break;
+
+          default:
+            message = data["error"] ?? message;
+        }
+      }
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
+    } finally {
+      if (mounted) {
+        setState(() {
+          purchaseLoading = false;
+        });
+      }
+    }
+  }
+
   Future<void> handleDonationRequest(ItemModel product) async {
     final repo = ProductDetaillesRepositoryImpl();
 
@@ -374,17 +461,17 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         bottomAction(
                           text: _getActionText(product),
                           isMyProduct: isMyProduct,
-
                           isRequested: isRequested,
-
                           isLoading: requestLoading,
-
                           isCheckingRequest: checkingRequest,
-
+                          isAvailable: product.isAvailable ?? true,
+                          purchaseLoading: purchaseLoading,
+                          onPurchase: () {
+                            handlePurchase(product);
+                          },
                           onRequest: () {
                             handleDonationRequest(product);
                           },
-
                           onEdit: () {
                             _showEditBottomSheet(product);
                           },

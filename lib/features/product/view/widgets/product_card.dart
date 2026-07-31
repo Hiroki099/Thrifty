@@ -23,7 +23,7 @@ class ProductCard extends StatelessWidget {
       badgeText = "donation";
     } else {
       badgeColor = const Color(0xffE8A87C);
-      badgeText = "fixed_price";
+      badgeText = "sale";
     }
 
     return GestureDetector(

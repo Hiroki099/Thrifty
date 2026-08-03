@@ -1,6 +1,5 @@
 import 'package:dealura/features/auth/view/pages/sign_in_page.dart';
 import 'package:dealura/features/auth/view/pages/sign_up_page.dart';
-import 'package:dealura/features/chat/view/pages/chat_details_page.dart';
 import 'package:dealura/features/navigation/view/pages/main_page.dart';
 import 'package:dealura/features/notification/view/pages/notification_page.dart';
 import 'package:dealura/features/onboarding/view/pages/get_started_page.dart';
@@ -39,10 +38,7 @@ abstract class AppRouter {
         path: '/publish',
         builder: (context, state) => const PublishPage(),
       ),
-      GoRoute(
-        path: '/chat_details',
-        builder: (context, state) => const ChatDetailsPage(),
-      ),
+
       GoRoute(
         path: '/notifications',
         builder: (context, state) => const NotificationPage(),

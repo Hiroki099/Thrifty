@@ -23,7 +23,7 @@ class _MainPageState extends State<MainPage> {
     pages = [
       HomePage(onSearchTap: () => onTabChanged(1)),
       const SearchPage(), // Search
-      const ChatsPage(), // Chat
+      ChatsPage(), // Chat
       const ProfilePage(), // Profile
     ];
   }

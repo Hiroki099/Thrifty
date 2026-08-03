@@ -1,8 +1,11 @@
 import 'package:dealura/core/errors/failures.dart';
+import 'package:dealura/core/utls/chat_client.dart';
 import 'package:dealura/core/utls/save_token.dart';
 import 'package:dealura/features/auth/cubit/auth_state.dart';
 import 'package:dealura/features/auth/repository/auth_repository.dart';
+import 'package:dealura/features/chat/repository/chat_repository_impl.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   final AuthRepository repo;
@@ -58,7 +61,33 @@ class AuthCubit extends Cubit<AuthState> {
 
         await saveTokens(token.access!, token.refresh!);
 
-        emit(AuthSuccess());
+        try {
+          final chatRepo = ChatRepositoryImpl();
+          final chat = await chatRepo.getChatToken();
+          await saveChatTokens(chat);
+          if (chat.apiKey == null || chat.userId == null || chat.token == null) {
+            // If chat initialization fails, still proceed with login
+            print("Warning: Failed to initialize chat, proceeding with login");
+            emit(AuthSuccess());
+            return;
+          }
+          streamClient = StreamChatClient(chat.apiKey!, logLevel: Level.INFO);
+
+          try {
+            await streamClient.connectUser(User(id: chat.userId!), chat.token!);
+            currentUserId = chat.userId!;
+          } catch (e) {
+            // If stream connection fails, still proceed with login
+            print("Warning: Failed to connect to stream chat: $e");
+            currentUserId = null;
+          }
+
+          emit(AuthSuccess());
+        } catch (e) {
+          // If chat setup fails entirely, still proceed with login
+          print("Warning: Chat setup failed: $e");
+          emit(AuthSuccess());
+        }
       },
     );
   }

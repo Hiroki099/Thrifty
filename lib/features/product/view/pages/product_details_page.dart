@@ -529,6 +529,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                         bottomAction(
                           context: context,
                           text: _getActionText(product),
+                          product: product,
                           isMyProduct: isMyProduct,
                           isRequested: isRequested,
                           isLoading: requestLoading,

@@ -1,7 +1,11 @@
+import 'package:dealura/core/utls/chat_client.dart';
+import 'package:dealura/features/chat/repository/chat_repository_impl.dart';
+import 'package:dealura/features/chat/view/pages/chat_details_page.dart';
+import 'package:dealura/features/home/model/item_model.dart';
 import 'package:flutter/material.dart';
 
 Widget bottomAction({
-  required String text,
+  required String text, required ItemModel product,
   required bool isMyProduct,
   bool isRequested = false,
   bool isLoading = false,
@@ -104,9 +108,40 @@ Widget bottomAction({
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: const Color(0xffD4D0CA), width: 1.5),
             ),
-            child: const Icon(
-              Icons.chat_bubble_outline,
-              color: Color(0xffB5B0A8),
+            child: GestureDetector(
+              onTap: () async {
+                try {
+                  final repo = ChatRepositoryImpl();
+
+                  final channelId = await repo.createChatForItem(product.id!);
+
+                  final channel = streamClient.channel(
+                    'messaging',
+                    id: channelId,
+                  );
+
+                  await channel.watch();
+
+                  if (!context.mounted) return;
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ChatDetailsPage(channel: channel),
+                    ),
+                  );
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Failed to open chat: $e')),
+                    );
+                  }
+                }
+              },
+              child: const Icon(
+                Icons.chat_bubble_outline,
+                color: Color(0xffB5B0A8),
+              ),
             ),
           ),
         ],
@@ -191,9 +226,40 @@ Widget bottomAction({
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: const Color(0xffD4D0CA), width: 1.5),
             ),
-            child: const Icon(
-              Icons.chat_bubble_outline,
-              color: Color(0xffB5B0A8),
+            child: GestureDetector(
+              onTap: () async {
+                try {
+                  final repo = ChatRepositoryImpl();
+
+                  final channelId = await repo.createChatForItem(product.id!);
+
+                  final channel = streamClient.channel(
+                    'messaging',
+                    id: channelId,
+                  );
+
+                  await channel.watch();
+
+                  if (!context.mounted) return;
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ChatDetailsPage(channel: channel),
+                    ),
+                  );
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Failed to open chat: $e')),
+                    );
+                  }
+                }
+              },
+              child: const Icon(
+                Icons.chat_bubble_outline,
+                color: Color(0xffB5B0A8),
+              ),
             ),
           ),
         ],
@@ -246,9 +312,40 @@ Widget bottomAction({
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: const Color(0xffD4D0CA), width: 1.5),
             ),
-            child: const Icon(
-              Icons.chat_bubble_outline,
-              color: Color(0xffB5B0A8),
+            child: GestureDetector(
+              onTap: () async {
+                try {
+                  final repo = ChatRepositoryImpl();
+
+                  final channelId = await repo.createChatForItem(product.id!);
+
+                  final channel = streamClient.channel(
+                    'messaging',
+                    id: channelId,
+                  );
+
+                  await channel.watch();
+
+                  if (!context.mounted) return;
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ChatDetailsPage(channel: channel),
+                    ),
+                  );
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Failed to open chat: $e')),
+                    );
+                  }
+                }
+              },
+              child: const Icon(
+                Icons.chat_bubble_outline,
+                color: Color(0xffB5B0A8),
+              ),
             ),
           ),
         ],

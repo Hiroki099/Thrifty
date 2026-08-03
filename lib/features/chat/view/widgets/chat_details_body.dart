@@ -1,6 +1,6 @@
-import 'package:dealura/features/chat/view/widgets/chat_bubble.dart';
+// import 'package:dealura/features/chat/view/widgets/chat_bubble.dart';
 import 'package:dealura/features/chat/view/widgets/chat_details_header.dart';
-import 'package:dealura/features/chat/view/widgets/message_input.dart';
+// import 'package:dealura/features/chat/view/widgets/message_input.dart';
 import 'package:flutter/material.dart';
 
 class ChatDetailsBody extends StatelessWidget {
@@ -21,17 +21,15 @@ class ChatDetailsBody extends StatelessWidget {
                 child: SizedBox(
                   width: double.infinity,
                   height: 490,
-                  child: ListView.separated(
-                    itemBuilder: (context, index) {
-                      return ChatBubble();
-                    },
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: 30),
-                    itemCount: 20,
-                  ),
+                  // child: ListView.separated(
+                  //   itemBuilder: (context, index) {
+                  //   },
+                  //   separatorBuilder: (context, index) =>
+                  //       const SizedBox(height: 30),
+                  //   itemCount: 20,
+                  // ),
                 ),
               ),
-              MessageInput(),
             ],
           ),
         ),

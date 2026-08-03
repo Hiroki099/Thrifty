@@ -1,15 +1,40 @@
 import 'package:dealura/core/utls/api_service.dart';
 import 'package:dealura/core/utls/app_router.dart';
+import 'package:dealura/core/utls/chat_client.dart';
+import 'package:dealura/core/utls/save_token.dart';
 import 'package:dealura/features/auth/cubit/auth_cubit.dart';
 import 'package:dealura/features/auth/repository/auth_repository_impl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
+  // Reinitialize streamClient if chat tokens are saved
+  final chatToken = await getChatToken();
+  final chatUserId = await getChatUserId();
+  final chatApiKey = await getChatApiKey();
+
+  if (chatToken != null && chatUserId != null && chatApiKey != null) {
+    streamClient = StreamChatClient(chatApiKey, logLevel: Level.INFO);
+    try {
+      await streamClient.connectUser(User(id: chatUserId), chatToken);
+      currentUserId = chatUserId;
+    } catch (e) {
+      // If connection fails, clear the tokens and initialize empty client
+      await clearTokens();
+      streamClient = StreamChatClient(chatApiKey, logLevel: Level.INFO);
+      currentUserId = null;
+    }
+  } else {
+    // Initialize client with empty data if no tokens exist
+    streamClient = StreamChatClient('placeholder', logLevel: Level.INFO);
+    currentUserId = null;
+  }
 
   runApp(MyApp());
 }

@@ -65,20 +65,44 @@ class AuthCubit extends Cubit<AuthState> {
           final chatRepo = ChatRepositoryImpl();
           final chat = await chatRepo.getChatToken();
           await saveChatTokens(chat);
-          if (chat.apiKey == null || chat.userId == null || chat.token == null) {
+          if (chat.apiKey == null ||
+              chat.userId == null ||
+              chat.token == null) {
             // If chat initialization fails, still proceed with login
             print("Warning: Failed to initialize chat, proceeding with login");
             emit(AuthSuccess());
             return;
           }
-          streamClient = StreamChatClient(chat.apiKey!, logLevel: Level.INFO);
+          print('AUTH CUBIT: Initializing Stream Chat client');
+          print('  API Key: ${chat.apiKey}');
+          print('  User ID: ${chat.userId}');
+          print('  Current streamClient user: ${streamClient.state.currentUser?.id}');
+          
+          // Check if there's already a connected user
+          if (streamClient.state.currentUser != null) {
+            print('AUTH CUBIT: Found existing connected user: ${streamClient.state.currentUser?.id}');
+            // We'll proceed with the new user without explicit disconnect
+          }
+          
+          // Create new StreamChatClient instance
+          streamClient = StreamChatClient(chat.apiKey!, logLevel: Level.OFF);
 
           try {
+            print('AUTH CUBIT: Connecting user to Stream Chat...');
             await streamClient.connectUser(User(id: chat.userId!), chat.token!);
-            currentUserId = chat.userId!;
+
+            print(
+              'AUTH CUBIT: STREAM CONNECTED USER: '
+              '${streamClient.state.currentUser?.id}',
+            );
+            
+            currentUserId = chat.userId;
+            print('AUTH CUBIT: currentUserId set to: $currentUserId');
+
+            emit(AuthSuccess());
           } catch (e) {
             // If stream connection fails, still proceed with login
-            print("Warning: Failed to connect to stream chat: $e");
+            print("AUTH CUBIT ERROR: Failed to connect to stream chat: $e");
             currentUserId = null;
           }
 

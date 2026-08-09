@@ -1,11 +1,11 @@
 import 'package:dealura/core/utls/chat_client.dart';
-import 'package:dealura/features/chat/repository/chat_repository_impl.dart';
 import 'package:dealura/features/chat/view/pages/chat_details_page.dart';
 import 'package:dealura/features/home/model/item_model.dart';
 import 'package:flutter/material.dart';
 
 Widget bottomAction({
-  required String text, required ItemModel product,
+  required String text,
+  required ItemModel product,
   required bool isMyProduct,
   bool isRequested = false,
   bool isLoading = false,
@@ -109,34 +109,8 @@ Widget bottomAction({
               border: Border.all(color: const Color(0xffD4D0CA), width: 1.5),
             ),
             child: GestureDetector(
-              onTap: () async {
-                try {
-                  final repo = ChatRepositoryImpl();
-
-                  final channelId = await repo.createChatForItem(product.id!);
-
-                  final channel = streamClient.channel(
-                    'messaging',
-                    id: channelId,
-                  );
-
-                  await channel.watch();
-
-                  if (!context.mounted) return;
-
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => ChatDetailsPage(channel: channel),
-                    ),
-                  );
-                } catch (e) {
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Failed to open chat: $e')),
-                    );
-                  }
-                }
+              onTap: () {
+                openProductChat(context: context, product: product);
               },
               child: const Icon(
                 Icons.chat_bubble_outline,
@@ -227,34 +201,8 @@ Widget bottomAction({
               border: Border.all(color: const Color(0xffD4D0CA), width: 1.5),
             ),
             child: GestureDetector(
-              onTap: () async {
-                try {
-                  final repo = ChatRepositoryImpl();
-
-                  final channelId = await repo.createChatForItem(product.id!);
-
-                  final channel = streamClient.channel(
-                    'messaging',
-                    id: channelId,
-                  );
-
-                  await channel.watch();
-
-                  if (!context.mounted) return;
-
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => ChatDetailsPage(channel: channel),
-                    ),
-                  );
-                } catch (e) {
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Failed to open chat: $e')),
-                    );
-                  }
-                }
+              onTap: () {
+                openProductChat(context: context, product: product);
               },
               child: const Icon(
                 Icons.chat_bubble_outline,
@@ -313,34 +261,8 @@ Widget bottomAction({
               border: Border.all(color: const Color(0xffD4D0CA), width: 1.5),
             ),
             child: GestureDetector(
-              onTap: () async {
-                try {
-                  final repo = ChatRepositoryImpl();
-
-                  final channelId = await repo.createChatForItem(product.id!);
-
-                  final channel = streamClient.channel(
-                    'messaging',
-                    id: channelId,
-                  );
-
-                  await channel.watch();
-
-                  if (!context.mounted) return;
-
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => ChatDetailsPage(channel: channel),
-                    ),
-                  );
-                } catch (e) {
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Failed to open chat: $e')),
-                    );
-                  }
-                }
+              onTap: () {
+                openProductChat(context: context, product: product);
               },
               child: const Icon(
                 Icons.chat_bubble_outline,
@@ -351,5 +273,84 @@ Widget bottomAction({
         ],
       ),
     );
+  }
+}
+
+Future<void> openProductChat({
+  required BuildContext context,
+  required ItemModel product,
+}) async {
+  try {
+    print('CHAT OPEN START: Item ID: ${product.id}');
+    print('CHAT OPEN: currentUserId from global: $currentUserId');
+    print('CHAT OPEN: Stream currentUser: ${streamClient.state.currentUser?.id}');
+    
+    // Update currentUserId from streamClient if it's null
+    if (currentUserId == null && streamClient.state.currentUser != null) {
+      currentUserId = streamClient.state.currentUser?.id;
+      print('CHAT OPEN: Updated currentUserId from streamClient: $currentUserId');
+    }
+    
+    if (currentUserId == null) {
+      print('CHAT OPEN ERROR: User not logged in');
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Please log in to chat')));
+      }
+      return;
+    }
+
+    final sellerId = product.owner?.id?.toString();
+
+    if (sellerId == null) {
+      print('CHAT OPEN ERROR: Seller ID is missing');
+      throw Exception('Seller ID is missing');
+    }
+
+    if (sellerId == currentUserId) {
+      print('CHAT OPEN ERROR: User trying to chat with themselves');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('You cannot chat with yourself')),
+      );
+      return;
+    }
+
+    print('CHAT OPEN: Current user: $currentUserId, Seller: $sellerId');
+
+    final ids = [currentUserId!, sellerId]..sort();
+
+    final channelId = 'item-${product.id}-${ids[0]}-${ids[1]}';
+
+    print('CHAT OPEN: Creating channel with ID: $channelId');
+
+    final channel = streamClient.channel('messaging', id: channelId);
+
+    print('CHAT OPEN: Creating channel...');
+    await channel.create();
+    print('CHAT OPEN: Channel created successfully');
+
+    print('CHAT OPEN: Adding members: [$currentUserId, $sellerId]');
+    await channel.addMembers([currentUserId!, sellerId]);
+    print('CHAT OPEN: Members added successfully');
+
+    print('CHAT OPEN: Watching channel...');
+    await channel.watch();
+    print('CHAT OPEN: Channel watched successfully');
+
+    if (!context.mounted) return;
+
+    print('CHAT OPEN: Navigating to chat details...');
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => ChatDetailsPage(channel: channel)),
+    );
+  } catch (e) {
+    print('CHAT OPEN ERROR: $e');
+    if (!context.mounted) return;
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Failed to open chat: $e')));
   }
 }

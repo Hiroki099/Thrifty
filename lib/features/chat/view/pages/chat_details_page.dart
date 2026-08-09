@@ -2,24 +2,81 @@ import 'package:dealura/core/utls/chat_client.dart';
 import 'package:flutter/material.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
-class ChatDetailsPage extends StatelessWidget {
+class ChatDetailsPage extends StatefulWidget {
   final Channel channel;
 
   const ChatDetailsPage({super.key, required this.channel});
+
+  @override
+  State<ChatDetailsPage> createState() => _ChatDetailsPageState();
+}
+
+class _ChatDetailsPageState extends State<ChatDetailsPage> {
+  @override
+  void initState() {
+    super.initState();
+    
+    print('CHAT DETAILS INIT: Opening channel ${widget.channel.id}');
+    print('  Channel type: ${widget.channel.type}');
+    print('  Channel CID: ${widget.channel.cid}');
+    print('  Current user: ${streamClient.state.currentUser?.id}');
+    
+    // Print channel members
+    final members = widget.channel.state?.members;
+    if (members != null) {
+      print('  Channel members (${members.length}):');
+      for (var member in members) {
+        print('    - User ID: ${member.user?.id}, Name: ${member.user?.name}');
+      }
+    }
+    
+    // Print existing messages
+    final messages = widget.channel.state?.messages;
+    if (messages != null) {
+      print('  Existing messages (${messages.length}):');
+      for (var message in messages) {
+        print('    - Message ID: ${message.id}');
+        print('      Text: ${message.text}');
+        print('      Sender ID: ${message.user?.id}');
+        print('      Sender Name: ${message.user?.name}');
+        print('      Created at: ${message.createdAt}');
+      }
+    } else {
+      print('  No existing messages found');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return StreamChat(
       client: streamClient,
       child: StreamChannel(
-        channel: channel,
+        channel: widget.channel,
         child: Scaffold(
           body: SafeArea(
             child: Column(
               children: [
-                StreamChannelHeader(),
-                Expanded(child: StreamMessageListView()),
-                StreamMessageComposer(),
+                const StreamChannelHeader(),
+
+                Expanded(
+                  child: StreamMessageListView(
+                    onMessageTap: (message) {
+                      print('CHAT DETAILS MESSAGE TAP: Message ${message.id}');
+                      print('  Text: ${message.text}');
+                      print('  Sender ID: ${message.user?.id}');
+                      print('  Sender Name: ${message.user?.name}');
+                    },
+                  ),
+                ),
+
+                StreamMessageComposer(
+                  onMessageSent: (message) {
+                    print('CHAT DETAILS MESSAGE SENT: Message ${message.id}');
+                    print('  Text: ${message.text}');
+                    print('  Sender ID: ${message.user?.id}');
+                    print('  Sender Name: ${message.user?.name}');
+                  },
+                ),
               ],
             ),
           ),

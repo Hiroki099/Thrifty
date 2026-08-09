@@ -12,31 +12,78 @@ import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
 
-  // Reinitialize streamClient if chat tokens are saved
   final chatToken = await getChatToken();
   final chatUserId = await getChatUserId();
   final chatApiKey = await getChatApiKey();
 
-  if (chatToken != null && chatUserId != null && chatApiKey != null) {
-    streamClient = StreamChatClient(chatApiKey, logLevel: Level.INFO);
+  if (chatToken != null &&
+      chatUserId != null &&
+      chatApiKey != null) {
+    print('MAIN: Initializing Stream Chat with user $chatUserId');
+    
+    // Check if there's already a connected user
+    if (streamClient.state.currentUser != null) {
+      print('MAIN: Found existing connected user: ${streamClient.state.currentUser?.id}');
+      // We'll proceed with the new user without explicit disconnect
+    }
+    
+    // Create new StreamChatClient instance
+    streamClient = StreamChatClient(
+      chatApiKey,
+      logLevel: Level.OFF,
+    );
+
     try {
-      await streamClient.connectUser(User(id: chatUserId), chatToken);
+      await streamClient.connectUser(
+        User(id: chatUserId),
+        chatToken,
+      );
+
+      print(
+        'MAIN: STREAM USER CONNECTED: '
+        '${streamClient.state.currentUser?.id}',
+      );
+      
+      // Set currentUserId for chat functionality
       currentUserId = chatUserId;
+      print('MAIN: currentUserId set to: $currentUserId');
+      
     } catch (e) {
-      // If connection fails, clear the tokens and initialize empty client
+      print(
+        'MAIN: STREAM AUTO CONNECT FAILED: $e',
+      );
+
       await clearTokens();
-      streamClient = StreamChatClient(chatApiKey, logLevel: Level.INFO);
+
+      // إنشاء client فقط، بدون مستخدم متصل.
+      streamClient = StreamChatClient(
+        chatApiKey,
+        logLevel: Level.OFF,
+      );
+      
       currentUserId = null;
     }
   } else {
-    // Initialize client with empty data if no tokens exist
-    streamClient = StreamChatClient('placeholder', logLevel: Level.INFO);
+    // لا يوجد مستخدم مسجل في Stream.
+    //
+    // لا نستخدم placeholder API key.
+    //
+    // سيتم إنشاء StreamChatClient الحقيقي بعد تسجيل الدخول.
+
+    print('MAIN: No Stream Chat tokens found, using placeholder');
+    streamClient = StreamChatClient(
+      'placeholder',
+      logLevel: Level.OFF,
+    );
+    
     currentUserId = null;
   }
 
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -47,13 +94,20 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => AuthCubit(AuthRepositoryImpl(ApiService())),
+          create: (context) => AuthCubit(
+            AuthRepositoryImpl(
+              ApiService(),
+            ),
+          ),
         ),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
         title: 'Dealura',
-        theme: ThemeData(scaffoldBackgroundColor: Color(0xFFFBF8F2)),
+        theme: ThemeData(
+          scaffoldBackgroundColor:
+              const Color(0xFFFBF8F2),
+        ),
         routerConfig: AppRouter.router,
       ),
     );

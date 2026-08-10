@@ -130,7 +130,7 @@ class ProfileRepositoryImpl implements ProfileRepository {
   Future<List<RequestModel>> getRecivedRequests() async {
     final data = await ApiService().get(
       endpoint: 'items/requests/',
-      queryParameters: {'type': 'recevied'},
+      queryParameters: {'type': 'received'},
     );
 
     return (data as List)

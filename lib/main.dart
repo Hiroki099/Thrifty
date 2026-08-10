@@ -27,7 +27,6 @@ void main() async {
       );
     }
 
-    // Create new StreamChatClient instance
     streamClient = StreamChatClient(chatApiKey, logLevel: Level.OFF);
 
     try {

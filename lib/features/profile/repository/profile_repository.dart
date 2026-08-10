@@ -15,6 +15,7 @@ abstract class ProfileRepository {
   Future<UserModel> getUserProfile(int userId);
   Future<List<ItemModel>> getMyItems();
   Future<List<ItemModel>> getMyClaims();
+  Future<List<ItemModel>> getMyRequests();
   Future<dynamic> deleteAccount();
   Future<void> logOut();
   Future<List<TransactionModel>> getMyWalletTransactions();

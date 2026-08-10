@@ -17,13 +17,17 @@ class _ChatsPageState extends State<ChatsPage> {
   void initState() {
     super.initState();
 
-    print('CHAT LIST INIT: streamClient.currentUser = ${streamClient.state.currentUser?.id}');
+    print(
+      'CHAT LIST INIT: streamClient.currentUser = ${streamClient.state.currentUser?.id}',
+    );
     print('CHAT LIST INIT: global currentUserId = $currentUserId');
-    
+
     // Update currentUserId from streamClient if needed
     if (currentUserId == null && streamClient.state.currentUser != null) {
       currentUserId = streamClient.state.currentUser?.id;
-      print('CHAT LIST INIT: Updated currentUserId from streamClient: $currentUserId');
+      print(
+        'CHAT LIST INIT: Updated currentUserId from streamClient: $currentUserId',
+      );
     }
 
     final userId = streamClient.state.currentUser?.id;
@@ -50,8 +54,6 @@ class _ChatsPageState extends State<ChatsPage> {
 
     // Listen to channel updates
     _controller.addListener(() {
-      // Note: In version 10.2.0, we can't directly access state
-      // We'll rely on the StreamChannelListView to show the data
       print('CHAT LIST: Controller listener triggered');
     });
   }
@@ -65,22 +67,29 @@ class _ChatsPageState extends State<ChatsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamChat(
-      client: streamClient,
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth > 600;
 
-      child: Scaffold(
-        appBar: AppBar(title: const Text('Messages')),
-
-        body: StreamChannelListView(
+    return Scaffold(
+      appBar: AppBar(title: const Text('Messages')),
+      body: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: isTablet ? 24.0 : 16.0,
+          vertical: isTablet ? 16.0 : 8.0,
+        ),
+        child: StreamChannelListView(
           controller: _controller,
-
           onChannelTap: (channel) {
             print('CHAT LIST TAP: Opening channel ${channel.id}');
             print('  Channel type: ${channel.type}');
             print('  Channel CID: ${channel.cid}');
-            print('  Channel members: ${channel.state?.members.map((m) => m.user?.id).toList()}');
+            print(
+              '  Channel members: ${channel.state?.members.map((m) => m.user?.id).toList()}',
+            );
             print('  Channel created by: ${channel.createdBy?.id}');
-            print('  Channel last message: ${channel.state?.lastMessage?.text}');
+            print(
+              '  Channel last message: ${channel.state?.lastMessage?.text}',
+            );
 
             Navigator.push(
               context,
@@ -92,14 +101,19 @@ class _ChatsPageState extends State<ChatsPage> {
           itemBuilder: (context, channels, index, defaultWidget) {
             final channel = channels[index];
             print('CHAT LIST ITEM: Channel ${channel.id}');
-            
+
             // Only show channels that start with "item-" (created by our app)
             if (channel.id != null && channel.id!.startsWith('item-')) {
               print('CHAT LIST ITEM: Showing channel ${channel.id}');
-              return defaultWidget;
+              return Padding(
+                padding: EdgeInsets.symmetric(vertical: isTablet ? 12.0 : 8.0),
+                child: defaultWidget,
+              );
             }
-            
-            print('CHAT LIST ITEM: Hiding channel ${channel.id} (not starting with "item-")');
+
+            print(
+              'CHAT LIST ITEM: Hiding channel ${channel.id} (not starting with "item-")',
+            );
             return const SizedBox.shrink(); // Hide other channels
           },
         ),

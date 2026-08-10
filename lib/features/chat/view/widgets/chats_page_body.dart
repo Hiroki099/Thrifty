@@ -32,8 +32,6 @@
 //   }
 // }
 
-
-
 // import 'package:dealura/core/utls/chat_client.dart';
 // import 'package:dealura/features/chat/view/pages/chat_details_page.dart';
 // import 'package:flutter/material.dart';

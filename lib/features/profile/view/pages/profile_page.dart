@@ -20,6 +20,7 @@ class _ProfilePageState extends State<ProfilePage> {
   bool isLoading = true;
   List<ItemModel> myItems = [];
   List<ItemModel> myClaims = [];
+  List<ItemModel> myRequests = [];
   @override
   void initState() {
     super.initState();
@@ -32,12 +33,14 @@ class _ProfilePageState extends State<ProfilePage> {
       ProfileRepositoryImpl().getMyWallet(),
       ProfileRepositoryImpl().getMyItems(),
       ProfileRepositoryImpl().getMyClaims(),
+      ProfileRepositoryImpl().getMyRequests(),
     ]);
 
     user = results[0] as UserModel;
     wallet = results[1] as WalletModel;
     myItems = results[2] as List<ItemModel>;
     myClaims = results[3] as List<ItemModel>;
+    myRequests = results[4] as List<ItemModel>;
 
     setState(() {
       isLoading = false;
@@ -264,8 +267,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             : GridView.builder(
                                 itemCount: myClaims.length,
                                 shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                padding: EdgeInsets.zero,
+
                                 gridDelegate:
                                     const SliverGridDelegateWithFixedCrossAxisCount(
                                       crossAxisCount: 2,
@@ -277,8 +279,23 @@ class _ProfilePageState extends State<ProfilePage> {
                                   return ProductCard(item: myClaims[index]);
                                 },
                               ),
+                        myRequests.isEmpty
+                            ? const Center(child: Text("No requests yet"))
+                            : GridView.builder(
+                                itemCount: myRequests.length,
+                                shrinkWrap: true,
 
-                        const Center(child: Text("Requests content here")),
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      mainAxisSpacing: 16,
+                                      crossAxisSpacing: 16,
+                                      childAspectRatio: 171 / 236,
+                                    ),
+                                itemBuilder: (context, index) {
+                                  return ProductCard(item: myRequests[index]);
+                                },
+                              ),
                       ],
                     ),
                   ),

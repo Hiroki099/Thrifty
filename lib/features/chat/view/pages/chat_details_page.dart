@@ -15,13 +15,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
   @override
   void initState() {
     super.initState();
-    
+
     print('CHAT DETAILS INIT: Opening channel ${widget.channel.id}');
     print('  Channel type: ${widget.channel.type}');
     print('  Channel CID: ${widget.channel.cid}');
     print('  Current user: ${streamClient.state.currentUser?.id}');
-    
-    // Print channel members
+
     final members = widget.channel.state?.members;
     if (members != null) {
       print('  Channel members (${members.length}):');
@@ -29,8 +28,7 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
         print('    - User ID: ${member.user?.id}, Name: ${member.user?.name}');
       }
     }
-    
-    // Print existing messages
+
     final messages = widget.channel.state?.messages;
     if (messages != null) {
       print('  Existing messages (${messages.length}):');
@@ -48,37 +46,33 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamChat(
-      client: streamClient,
-      child: StreamChannel(
-        channel: widget.channel,
-        child: Scaffold(
-          body: SafeArea(
-            child: Column(
-              children: [
-                const StreamChannelHeader(),
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth > 600;
 
-                Expanded(
-                  child: StreamMessageListView(
-                    onMessageTap: (message) {
-                      print('CHAT DETAILS MESSAGE TAP: Message ${message.id}');
-                      print('  Text: ${message.text}');
-                      print('  Sender ID: ${message.user?.id}');
-                      print('  Sender Name: ${message.user?.name}');
-                    },
+    return StreamChannel(
+      channel: widget.channel,
+      child: Scaffold(
+        body: SafeArea(
+          child: Column(
+            children: [
+              const StreamChannelHeader(),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isTablet ? 24.0 : 16.0,
+                    vertical: isTablet ? 16.0 : 8.0,
                   ),
+                  child: const StreamMessageListView(),
                 ),
-
-                StreamMessageComposer(
-                  onMessageSent: (message) {
-                    print('CHAT DETAILS MESSAGE SENT: Message ${message.id}');
-                    print('  Text: ${message.text}');
-                    print('  Sender ID: ${message.user?.id}');
-                    print('  Sender Name: ${message.user?.name}');
-                  },
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isTablet ? 24.0 : 16.0,
+                  vertical: isTablet ? 16.0 : 8.0,
                 ),
-              ],
-            ),
+                child: StreamMessageComposer(),
+              ),
+            ],
           ),
         ),
       ),

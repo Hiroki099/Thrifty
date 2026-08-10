@@ -283,14 +283,18 @@ Future<void> openProductChat({
   try {
     print('CHAT OPEN START: Item ID: ${product.id}');
     print('CHAT OPEN: currentUserId from global: $currentUserId');
-    print('CHAT OPEN: Stream currentUser: ${streamClient.state.currentUser?.id}');
-    
+    print(
+      'CHAT OPEN: Stream currentUser: ${streamClient.state.currentUser?.id}',
+    );
+
     // Update currentUserId from streamClient if it's null
     if (currentUserId == null && streamClient.state.currentUser != null) {
       currentUserId = streamClient.state.currentUser?.id;
-      print('CHAT OPEN: Updated currentUserId from streamClient: $currentUserId');
+      print(
+        'CHAT OPEN: Updated currentUserId from streamClient: $currentUserId',
+      );
     }
-    
+
     if (currentUserId == null) {
       print('CHAT OPEN ERROR: User not logged in');
       if (context.mounted) {

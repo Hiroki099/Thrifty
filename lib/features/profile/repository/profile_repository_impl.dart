@@ -112,4 +112,16 @@ class ProfileRepositoryImpl implements ProfileRepository {
       return Future.error(e);
     }
   }
+
+  @override
+  Future<List<ItemModel>> getMyRequests() async {
+    final data = await ApiService().get(
+      endpoint: 'items/requests/',
+      queryParameters: {'type': 'sent'},
+    );
+
+    return (data as List)
+        .map((e) => ItemModel.fromJson(e['item'] as Map<String, dynamic>))
+        .toList();
+  }
 }

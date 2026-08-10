@@ -101,4 +101,21 @@ class ProductDetaillesRepositoryImpl implements ProductDetailesRepository {
               .toList(),
         );
   }
+
+  @override
+  Future<List<RatingModel>> getMyGivenRatings() async {
+    final api = ApiService();
+    final data = await api.get(endpoint: 'ratings/my-given-ratings/');
+    return (data as List).map((e) => RatingModel.fromJson(e)).toList();
+  }
+
+  @override
+  Future<Map<String, dynamic>> rateSellerFromClaimed(
+    int itemId,
+    int rate,
+  ) async {
+    final api = ApiService();
+    final data = await api.post('ratings/item/$itemId', {'rating': rate});
+    return data as Map<String, dynamic>;
+  }
 }

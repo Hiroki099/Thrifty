@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dealura/features/auth/model/user_model.dart';
 import 'package:dealura/features/home/model/item_model.dart';
+import 'package:dealura/features/product/models/request_model.dart';
 import 'package:dealura/features/profile/model/transaction_model.dart';
 import 'package:dealura/features/profile/model/wallet_model.dart';
 
@@ -20,4 +21,7 @@ abstract class ProfileRepository {
   Future<void> logOut();
   Future<List<TransactionModel>> getMyWalletTransactions();
   Future<WalletModel> getMyWallet();
+  Future<List<RequestModel>> getRecivedRequests();
+  Future<Map<String, dynamic>> rejectRequest(int requestId);
+  Future<Map<String, dynamic>> acceptRequest(int requestId);
 }

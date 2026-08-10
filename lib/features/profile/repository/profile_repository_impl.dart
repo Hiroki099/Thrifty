@@ -4,6 +4,7 @@ import 'package:dealura/core/utls/api_service.dart';
 import 'package:dealura/core/utls/save_token.dart';
 import 'package:dealura/features/auth/model/user_model.dart';
 import 'package:dealura/features/home/model/item_model.dart';
+import 'package:dealura/features/product/models/request_model.dart';
 import 'package:dealura/features/profile/model/transaction_model.dart';
 import 'package:dealura/features/profile/model/wallet_model.dart';
 import 'package:dealura/features/profile/repository/profile_repository.dart';
@@ -123,5 +124,35 @@ class ProfileRepositoryImpl implements ProfileRepository {
     return (data as List)
         .map((e) => ItemModel.fromJson(e['item'] as Map<String, dynamic>))
         .toList();
+  }
+
+  @override
+  Future<List<RequestModel>> getRecivedRequests() async {
+    final data = await ApiService().get(
+      endpoint: 'items/requests/',
+      queryParameters: {'type': 'recevied'},
+    );
+
+    return (data as List)
+        .map((e) => RequestModel.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  @override
+  Future<Map<String, dynamic>> rejectRequest(int requestId) async {
+    final api = ApiService();
+    final data = await api.patch('items/requests/$requestId/action/', {
+      'status': 'rejected',
+    });
+    return data;
+  }
+
+  @override
+  Future<Map<String, dynamic>> acceptRequest(int requestId) async {
+    final api = ApiService();
+    final data = await api.patch('items/requests/$requestId/action/', {
+      'status': 'accepted',
+    });
+    return data;
   }
 }

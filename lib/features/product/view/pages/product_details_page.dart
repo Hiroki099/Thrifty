@@ -27,6 +27,200 @@ class ProductDetailsPage extends StatefulWidget {
 }
 
 class _ProductDetailsPageState extends State<ProductDetailsPage> {
+  Future<void> showRatingDialog() async {
+    int selectedRating = 5;
+
+    final rating = await showModalBottomSheet<int>(
+      context: context,
+      backgroundColor: const Color(0xffFBF8F2),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 35),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Rate this seller',
+                    style: TextStyle(
+                      fontFamily: 'DM Serif Display',
+                      fontSize: 25,
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  const Text(
+                    'How was your experience?',
+                    style: TextStyle(
+                      fontFamily: 'IBM Plex Sans',
+                      fontSize: 15,
+                      color: Color(0xff8A8580),
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(5, (index) {
+                      final starNumber = index + 1;
+
+                      return GestureDetector(
+                        onTap: () {
+                          setModalState(() {
+                            selectedRating = starNumber;
+                          });
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 5),
+                          child: Icon(
+                            starNumber <= selectedRating
+                                ? Icons.star
+                                : Icons.star_border,
+                            size: 42,
+                            color: const Color(0xffE8A87C),
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  Text(
+                    '$selectedRating / 5',
+                    style: const TextStyle(
+                      fontFamily: 'IBM Plex Sans',
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context, selectedRating);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xffE8A87C),
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Submit rating',
+                        style: TextStyle(
+                          fontFamily: 'IBM Plex Sans',
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+
+    if (rating != null && mounted) {
+      await rateProduct(rating);
+    }
+  }
+
+  Future<void> rateProduct(int rating) async {
+    if (rating < 1 || rating > 5) return;
+
+    setState(() {
+      ratingLoading = true;
+    });
+
+    try {
+      final repo = ProductDetaillesRepositoryImpl();
+
+      await repo.rateSellerFromClaimed(widget.id!, rating);
+
+      if (!mounted) return;
+
+      setState(() {
+        canRateProduct = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Rating submitted successfully'),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      // Don't reload data immediately to avoid overwriting canRateProduct
+      // The rating button will remain hidden as set above
+    } on DioException catch (e) {
+      print('RATE ERROR: ${e.response?.statusCode}');
+      print('RATE ERROR DATA: ${e.response?.data}');
+
+      // If the rating was successful on the server but response format is unexpected,
+      // still consider it a success and hide the rating button
+      if (e.response?.statusCode == 200 || e.response?.statusCode == 201) {
+        if (!mounted) return;
+
+        setState(() {
+          canRateProduct = false;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Rating submitted successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        return;
+      }
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            e.response?.data?['detail']?.toString() ??
+                e.response?.data?['error']?.toString() ??
+                'Failed to submit rating',
+          ),
+        ),
+      );
+    } catch (e) {
+      print('RATE ERROR: $e');
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Failed to submit rating')));
+    } finally {
+      if (mounted) {
+        setState(() {
+          ratingLoading = false;
+        });
+      }
+    }
+  }
+
+  bool canRateProduct = false;
+  bool checkingRating = false;
+  bool ratingLoading = false;
   bool isRequested = false;
   bool requestLoading = false;
   bool checkingRequest = false;
@@ -34,6 +228,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   bool checkedRequest = false;
   bool purchaseLoading = false;
   final TextEditingController bidController = TextEditingController();
+  List<ItemModel> myClaims = [];
   Future<void> handleBid(AuctionModel auction, int amount) async {
     final repo = ProductDetaillesRepositoryImpl();
 
@@ -354,12 +549,15 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   Future<Map<String, dynamic>> loadData() async {
     final repo = ProductDetaillesRepositoryImpl();
     final prepo = ProfileRepositoryImpl();
+
     final product = await repo.getProductDetailes(widget.id!);
     final me = await prepo.getMyProfile();
+
     AuctionModel? auction;
 
     if (product.listingType == "auction") {
       auction = await repo.getAuctionDetails(widget.id!);
+
       if (auction.endTime != null) {
         if (auction.endTime!.isAfter(DateTime.now())) {
           auctionEnded = false;
@@ -374,13 +572,42 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     final results = await Future.wait([
       repo.getProductImages(widget.id!),
       repo.getOwnerRating(product.owner!.id!),
+      prepo.getMyClaims(),
+      repo.getMyGivenRatings(),
     ]);
+
+    final images = results[0] as List<ImageModel>;
+    final ratings = results[1] as List<RatingModel>;
+    myClaims = results[2] as List<ItemModel>;
+    final myGivenRatings = results[3] as List<RatingModel>;
+
+    final isClaimed = myClaims.any((item) => item.id == product.id);
+
+    final alreadyRated = myGivenRatings.any(
+      (rating) => rating.itemDetailUrl == product.detailUrl,
+    );
+
+    canRateProduct = isClaimed && !alreadyRated;
+
+    print('Product ID: ${product.id}');
+    print('Is claimed: $isClaimed');
+    print('Already rated: $alreadyRated');
+    print('Can rate: $canRateProduct');
+    for (final rating in myGivenRatings) {
+      print('================ RATING =================');
+      print('Rating ID: ${rating.id}');
+      print('Item Name: ${rating.itemName}');
+      print('Rating item URL: ${rating.itemDetailUrl}');
+      print('Product detail URL: ${product.detailUrl}');
+      print('Same URL: ${rating.itemDetailUrl == product.detailUrl}');
+    }
     return {
       'product': product,
-      'images': results[0] as List<ImageModel>,
-      'ratings': results[1] as List<RatingModel>,
+      'images': images,
+      'ratings': ratings,
       'auction': auction,
       'me': me,
+      'canRateProduct': canRateProduct,
     };
   }
 
@@ -442,6 +669,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           },
                         ),
 
+                        // Back button
                         Positioned(
                           top: 20,
                           left: 16,
@@ -464,6 +692,38 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           ),
                         ),
 
+                        // Rating button
+                        if (canRateProduct)
+                          Positioned(
+                            top: 20,
+                            right: 16,
+                            child: GestureDetector(
+                              onTap: ratingLoading ? null : showRatingDialog,
+                              child: Container(
+                                width: 40,
+                                height: 40,
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: ratingLoading
+                                    ? const Padding(
+                                        padding: EdgeInsets.all(11),
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Color(0xffE8A87C),
+                                        ),
+                                      )
+                                    : const Icon(
+                                        Icons.star_border_rounded,
+                                        color: Color(0xffE8A87C),
+                                        size: 25,
+                                      ),
+                              ),
+                            ),
+                          ),
+
+                        // Dots
                         Positioned(
                           bottom: 10,
                           left: 16,
@@ -535,6 +795,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                           isLoading: requestLoading,
                           isCheckingRequest: checkingRequest,
                           isAvailable: product.isAvailable ?? true,
+                          isClaimed: myClaims.any((item) => item.id == product.id),
                           purchaseLoading: purchaseLoading,
                           onPurchase: () {
                             handlePurchase(product);
@@ -551,6 +812,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                   handleBid(auction, amount);
                                 },
                           bidController: bidController,
+
                         ),
                       ],
                     ),

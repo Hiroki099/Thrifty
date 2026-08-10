@@ -11,6 +11,7 @@ Widget bottomAction({
   bool isLoading = false,
   bool isCheckingRequest = false,
   bool isAvailable = true,
+  bool isClaimed = false,
   bool purchaseLoading = false,
   VoidCallback? onPurchase,
   VoidCallback? onRequest,
@@ -18,6 +19,7 @@ Widget bottomAction({
   ValueChanged<int>? onBid,
   required BuildContext context,
   TextEditingController? bidController,
+
 }) {
   if (isMyProduct) {
     Color color;
@@ -101,23 +103,25 @@ Widget bottomAction({
             ),
           ),
           const SizedBox(width: 10),
-          Container(
-            height: 50,
-            width: 50,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xffD4D0CA), width: 1.5),
-            ),
-            child: GestureDetector(
-              onTap: () {
-                openProductChat(context: context, product: product);
-              },
-              child: const Icon(
-                Icons.chat_bubble_outline,
-                color: Color(0xffB5B0A8),
+          if (isAvailable || isClaimed) ...[
+            Container(
+              height: 50,
+              width: 50,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xffD4D0CA), width: 1.5),
+              ),
+              child: GestureDetector(
+                onTap: () {
+                  openProductChat(context: context, product: product);
+                },
+                child: const Icon(
+                  Icons.chat_bubble_outline,
+                  color: Color(0xffB5B0A8),
+                ),
               ),
             ),
-          ),
+          ],
         ],
       ),
     );
@@ -193,23 +197,25 @@ Widget bottomAction({
               ),
             ),
           ),
-          Container(
-            height: 50,
-            width: 50,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xffD4D0CA), width: 1.5),
-            ),
-            child: GestureDetector(
-              onTap: () {
-                openProductChat(context: context, product: product);
-              },
-              child: const Icon(
-                Icons.chat_bubble_outline,
-                color: Color(0xffB5B0A8),
+          if (isAvailable || isClaimed) ...[
+            Container(
+              height: 50,
+              width: 50,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xffD4D0CA), width: 1.5),
+              ),
+              child: GestureDetector(
+                onTap: () {
+                  openProductChat(context: context, product: product);
+                },
+                child: const Icon(
+                  Icons.chat_bubble_outline,
+                  color: Color(0xffB5B0A8),
+                ),
               ),
             ),
-          ),
+          ],
         ],
       ),
     );
@@ -253,23 +259,25 @@ Widget bottomAction({
             ),
           ),
           const SizedBox(width: 10),
-          Container(
-            height: 50,
-            width: 50,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xffD4D0CA), width: 1.5),
-            ),
-            child: GestureDetector(
-              onTap: () {
-                openProductChat(context: context, product: product);
-              },
-              child: const Icon(
-                Icons.chat_bubble_outline,
-                color: Color(0xffB5B0A8),
+          if (isAvailable || isClaimed) ...[
+            Container(
+              height: 50,
+              width: 50,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xffD4D0CA), width: 1.5),
+              ),
+              child: GestureDetector(
+                onTap: () {
+                  openProductChat(context: context, product: product);
+                },
+                child: const Icon(
+                  Icons.chat_bubble_outline,
+                  color: Color(0xffB5B0A8),
+                ),
               ),
             ),
-          ),
+          ],
         ],
       ),
     );

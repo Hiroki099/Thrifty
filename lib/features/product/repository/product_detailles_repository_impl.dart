@@ -115,7 +115,23 @@ class ProductDetaillesRepositoryImpl implements ProductDetailesRepository {
     int rate,
   ) async {
     final api = ApiService();
-    final data = await api.post('ratings/item/$itemId', {'rating': rate});
-    return data as Map<String, dynamic>;
+    final response = await api.post('ratings/item/$itemId/', {'rating': rate});
+
+    if (response is Map<String, dynamic>) {
+      return response.data;
+    }
+
+    if (response.toString().contains('Response')) {
+      try {
+        final responseData = response as dynamic;
+        if (responseData.data is Map<String, dynamic>) {
+          return responseData.data as Map<String, dynamic>;
+        }
+      } catch (e) {
+        print('Error extracting response data: $e');
+      }
+    }
+
+    return {};
   }
 }

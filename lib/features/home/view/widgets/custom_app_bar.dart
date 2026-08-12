@@ -1,5 +1,6 @@
 import 'package:dealura/core/utls/app_router.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 class CustomAppBar extends StatelessWidget {
   const CustomAppBar({super.key});
@@ -34,19 +35,27 @@ class CustomAppBar extends StatelessWidget {
               ),
             ],
           ),
-          GestureDetector(
-            onTap: () {
-              AppRouter.router.push('/notifications');
-            },
-            child: Container(
-              height: 30,
-              width: 28,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Color(0xffE7A072), width: 1),
+          Row(
+            children: [
+              GestureDetector(onTap: () => AppRouter.router.push('/exchange'),
+                child: SvgPicture.asset('assets/images/exchange.svg'),
               ),
-              child: Image.asset('assets/images/Bell_icon.png'),
-            ),
+              SizedBox(width: 15),
+              GestureDetector(
+                onTap: () {
+                  AppRouter.router.push('/notifications');
+                },
+                child: Container(
+                  height: 30,
+                  width: 28,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Color(0xffE7A072), width: 1),
+                  ),
+                  child: Image.asset('assets/images/Bell_icon.png'),
+                ),
+              ),
+            ],
           ),
         ],
       ),

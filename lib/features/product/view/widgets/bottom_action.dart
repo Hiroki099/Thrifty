@@ -19,7 +19,6 @@ Widget bottomAction({
   ValueChanged<int>? onBid,
   required BuildContext context,
   TextEditingController? bidController,
-
 }) {
   if (isMyProduct) {
     Color color;

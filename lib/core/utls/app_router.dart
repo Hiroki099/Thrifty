@@ -1,5 +1,6 @@
 import 'package:dealura/features/auth/view/pages/sign_in_page.dart';
 import 'package:dealura/features/auth/view/pages/sign_up_page.dart';
+import 'package:dealura/features/forecast/view/exchange_page.dart';
 import 'package:dealura/features/navigation/view/pages/main_page.dart';
 import 'package:dealura/features/notification/view/pages/notification_page.dart';
 import 'package:dealura/features/onboarding/view/pages/get_started_page.dart';
@@ -59,6 +60,10 @@ abstract class AppRouter {
       GoRoute(
         path: '/ratings',
         builder: (context, state) => const RatingsPage(),
+      ),
+      GoRoute(
+        path: '/exchange',
+        builder: (context, state) => const ExchangePage(),
       ),
     ],
   );

@@ -81,7 +81,7 @@ class _RatingsPageState extends State<RatingsPage> {
 
           child: Column(
             children: [
-           Row(
+              Row(
                 children: [
                   GestureDetector(
                     onTap: () {
@@ -108,7 +108,7 @@ class _RatingsPageState extends State<RatingsPage> {
               ),
 
               const SizedBox(height: 26),
-     Expanded(
+              Expanded(
                 child: DefaultTabController(
                   length: 2,
                   child: Column(
@@ -138,8 +138,8 @@ class _RatingsPageState extends State<RatingsPage> {
                       Expanded(
                         child: TabBarView(
                           children: [
-                           _buildGivenRatings(),
-      _buildReceivedRatings(),
+                            _buildGivenRatings(),
+                            _buildReceivedRatings(),
                           ],
                         ),
                       ),
@@ -180,7 +180,7 @@ class _RatingsPageState extends State<RatingsPage> {
             rating: rating,
 
             isReceived: false,
-    onRatingUpdated: () {
+            onRatingUpdated: () {
               loadRatings();
             },
           );
@@ -191,10 +191,11 @@ class _RatingsPageState extends State<RatingsPage> {
 
   Widget _buildReceivedRatings() {
     return Column(
-      children: [ _buildRatingSummary(),
+      children: [
+        _buildRatingSummary(),
 
         const SizedBox(height: 18),
- Expanded(
+        Expanded(
           child: receivedRatings.isEmpty
               ? _emptyRatings("No received ratings yet")
               : ListView.separated(

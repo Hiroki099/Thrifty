@@ -48,7 +48,7 @@ class _HomePageBodyState extends State<HomePageBody> {
       isLoading = true;
     });
 
-    items = await repository.getItemsList(categoryId, null, true);
+    items = await repository.getItemsList(categoryId, null, null);
 
     setState(() {
       isLoading = false;
@@ -82,6 +82,54 @@ class _HomePageBodyState extends State<HomePageBody> {
               const SizedBox(
                 height: 500,
                 child: Center(child: CircularProgressIndicator()),
+              )
+            else if (items.isEmpty)
+              SizedBox(
+                width: double.infinity,
+                height: 300,
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 30,
+                      vertical: 24,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xffFBF8F2),
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: const Color(0xffEFE9E2)),
+                    ),
+                    child: const Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.inventory_2_outlined,
+                          size: 46,
+                          color: Color(0xffE8A87C),
+                        ),
+                        SizedBox(height: 14),
+                        Text(
+                          'No items found',
+                          style: TextStyle(
+                            fontFamily: 'IBM Plex Sans',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xff24211E),
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Text(
+                          'There are no items in this category.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontFamily: 'IBM Plex Sans',
+                            fontSize: 13,
+                            color: Color(0xff8A8580),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               )
             else
               SizedBox(

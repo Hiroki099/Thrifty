@@ -27,11 +27,6 @@ abstract class ProfileRepository {
   Future<Map<String, dynamic>> acceptRequest(int requestId);
   Future<List<RatingModel>> getMyGivenRatings();
   Future<List<RatingModel>> getMyReceivedRatings();
-  Future<void> editRate(
-    int? rateId,
-    String? newComment,
-    int? newRating,
-  );
-Future<void> deleteRate(int? rateId);
-
+  Future<void> editRate(int? rateId, String? newComment, int? newRating);
+  Future<void> deleteRate(int? rateId);
 }

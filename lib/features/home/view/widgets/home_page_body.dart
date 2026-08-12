@@ -84,20 +84,23 @@ class _HomePageBodyState extends State<HomePageBody> {
                 child: Center(child: CircularProgressIndicator()),
               )
             else
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                padding: EdgeInsets.zero,
-                itemCount: items.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 16,
-                  crossAxisSpacing: 16,
-                  childAspectRatio: 171 / 236,
+              SizedBox(
+                width: 358,
+                height: 500,
+                child: GridView.builder(
+                  shrinkWrap: true,
+                  padding: EdgeInsets.zero,
+                  itemCount: items.length,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 16,
+                    crossAxisSpacing: 16,
+                    childAspectRatio: 171 / 236,
+                  ),
+                  itemBuilder: (context, index) {
+                    return ProductCard(item: items[index]);
+                  },
                 ),
-                itemBuilder: (context, index) {
-                  return ProductCard(item: items[index]);
-                },
               ),
           ],
         ),

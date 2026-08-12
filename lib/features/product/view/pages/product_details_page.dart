@@ -4,6 +4,7 @@ import 'package:dealura/features/product/models/RatingModel.dart';
 import 'package:dealura/features/product/models/auction_model.dart';
 import 'package:dealura/features/product/models/image_model/image_model.dart';
 import 'package:dealura/features/product/repository/product_detailles_repository_impl.dart';
+import 'package:dealura/features/product/view/widgets/Rating_bottom_sheet.dart';
 import 'package:dealura/features/product/view/widgets/bottom_action.dart';
 import 'package:dealura/features/product/view/widgets/custom_photo_dots.dart';
 import 'package:dealura/features/product/view/widgets/edit_product_bottomsheet.dart';
@@ -28,120 +29,27 @@ class ProductDetailsPage extends StatefulWidget {
 
 class _ProductDetailsPageState extends State<ProductDetailsPage> {
   Future<void> showRatingDialog() async {
-    int selectedRating = 5;
-
-    final rating = await showModalBottomSheet<int>(
+    final result = await showModalBottomSheet<Map<String, dynamic>>(
       context: context,
+      isScrollControlled: true,
       backgroundColor: const Color(0xffFBF8F2),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            return Padding(
-              padding: const EdgeInsets.fromLTRB(24, 24, 24, 35),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text(
-                    'Rate this seller',
-                    style: TextStyle(
-                      fontFamily: 'DM Serif Display',
-                      fontSize: 25,
-                    ),
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  const Text(
-                    'How was your experience?',
-                    style: TextStyle(
-                      fontFamily: 'IBM Plex Sans',
-                      fontSize: 15,
-                      color: Color(0xff8A8580),
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(5, (index) {
-                      final starNumber = index + 1;
-
-                      return GestureDetector(
-                        onTap: () {
-                          setModalState(() {
-                            selectedRating = starNumber;
-                          });
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 5),
-                          child: Icon(
-                            starNumber <= selectedRating
-                                ? Icons.star
-                                : Icons.star_border,
-                            size: 42,
-                            color: const Color(0xffE8A87C),
-                          ),
-                        ),
-                      );
-                    }),
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  Text(
-                    '$selectedRating / 5',
-                    style: const TextStyle(
-                      fontFamily: 'IBM Plex Sans',
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context, selectedRating);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xffE8A87C),
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: const Text(
-                        'Submit rating',
-                        style: TextStyle(
-                          fontFamily: 'IBM Plex Sans',
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        );
+      builder: (_) {
+        return const RatingBottomSheet();
       },
     );
 
-    if (rating != null && mounted) {
-      await rateProduct(rating);
-    }
+    if (result == null || !mounted) return;
+
+    final rating = result['rating'] as int;
+    final comment = result['comment'] as String;
+
+    await rateProduct(rating, comment);
   }
 
-  Future<void> rateProduct(int rating) async {
+  Future<void> rateProduct(int rating, String comment) async {
     if (rating < 1 || rating > 5) return;
 
     setState(() {
@@ -151,7 +59,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     try {
       final repo = ProductDetaillesRepositoryImpl();
 
-      await repo.rateSellerFromClaimed(widget.id!, rating);
+      await repo.rateSellerFromClaimed(widget.id!, rating, comment);
 
       if (!mounted) return;
 
@@ -165,15 +73,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           backgroundColor: Colors.green,
         ),
       );
-
-      // Don't reload data immediately to avoid overwriting canRateProduct
-      // The rating button will remain hidden as set above
     } on DioException catch (e) {
       print('RATE ERROR: ${e.response?.statusCode}');
       print('RATE ERROR DATA: ${e.response?.data}');
 
-      // If the rating was successful on the server but response format is unexpected,
-      // still consider it a success and hide the rating button
       if (e.response?.statusCode == 200 || e.response?.statusCode == 201) {
         if (!mounted) return;
 
@@ -187,20 +90,27 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             backgroundColor: Colors.green,
           ),
         );
+
         return;
       }
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            e.response?.data?['detail']?.toString() ??
-                e.response?.data?['error']?.toString() ??
-                'Failed to submit rating',
-          ),
-        ),
-      );
+      String message = 'Failed to submit rating';
+
+      final data = e.response?.data;
+
+      if (data is Map<String, dynamic>) {
+        message =
+            data['detail']?.toString() ??
+            data['error']?.toString() ??
+            data['comment']?.toString() ??
+            message;
+      }
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
     } catch (e) {
       print('RATE ERROR: $e');
 
@@ -227,14 +137,22 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   int? requestId;
   bool checkedRequest = false;
   bool purchaseLoading = false;
+  bool bidLoading = false;
   final TextEditingController bidController = TextEditingController();
   List<ItemModel> myClaims = [];
   Future<void> handleBid(AuctionModel auction, int amount) async {
+    if (bidLoading) return;
+
     final repo = ProductDetaillesRepositoryImpl();
+
+    setState(() {
+      bidLoading = true;
+    });
 
     try {
       print("Auction ID: ${auction.id}");
       print("Amount: $amount");
+
       await repo.createBid(auction.id!, amount);
 
       if (!mounted) return;
@@ -246,6 +164,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         ),
       );
 
+      // Reload all page data after successful bid
       final data = await loadData();
 
       if (!mounted) return;
@@ -290,9 +209,26 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(message)));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message), backgroundColor: Colors.red),
+      );
+    } catch (e) {
+      print("BID ERROR: $e");
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Failed to place bid"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          bidLoading = false;
+        });
+      }
     }
   }
 
@@ -615,213 +551,236 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffFAF6F0),
-      body: FutureBuilder<Map<String, dynamic>>(
-        future: pageData,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: Stack(
+        children: [
+          FutureBuilder<Map<String, dynamic>>(
+            future: pageData,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
-          if (snapshot.hasError) {
-            return Center(child: Text(snapshot.error.toString()));
-          }
+              if (snapshot.hasError) {
+                return Center(child: Text(snapshot.error.toString()));
+              }
 
-          final product = snapshot.data!['product'] as ItemModel;
-          final images = snapshot.data!['images'] as List<ImageModel>;
-          final ratings = snapshot.data!['ratings'] as List<RatingModel>;
-          final auction = snapshot.data!['auction'] as AuctionModel?;
-          final me = snapshot.data!['me'] as UserModel;
+              final product = snapshot.data!['product'] as ItemModel;
+              final images = snapshot.data!['images'] as List<ImageModel>;
+              final ratings = snapshot.data!['ratings'] as List<RatingModel>;
+              final auction = snapshot.data!['auction'] as AuctionModel?;
+              final me = snapshot.data!['me'] as UserModel;
 
-          final isMyProduct = product.owner?.id == me.id;
+              final isMyProduct = product.owner?.id == me.id;
 
-          if (product.listingType == "donation" &&
-              !isMyProduct &&
-              !checkedRequest) {
-            checkedRequest = true;
+              if (product.listingType == "donation" &&
+                  !isMyProduct &&
+                  !checkedRequest) {
+                checkedRequest = true;
 
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              checkDonationRequest(product);
-            });
-          }
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  checkDonationRequest(product);
+                });
+              }
 
-          return SafeArea(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    height: 220,
-                    child: Stack(
-                      children: [
-                        PageView.builder(
-                          itemCount: images.isEmpty ? 1 : images.length,
-                          onPageChanged: (index) {
-                            setState(() {
-                              currentPage = index;
-                            });
-                          },
-                          itemBuilder: (_, index) {
-                            if (images.isEmpty) {
-                              return productImage(product.image ?? '');
-                            }
+              return SafeArea(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: 220,
+                        child: Stack(
+                          children: [
+                            PageView.builder(
+                              itemCount: images.isEmpty ? 1 : images.length,
+                              onPageChanged: (index) {
+                                setState(() {
+                                  currentPage = index;
+                                });
+                              },
+                              itemBuilder: (_, index) {
+                                if (images.isEmpty) {
+                                  return productImage(product.image ?? '');
+                                }
 
-                            return productImage(images[index].imageUrl ?? '');
-                          },
-                        ),
+                                return productImage(
+                                  images[index].imageUrl ?? '',
+                                );
+                              },
+                            ),
 
-                        // Back button
-                        Positioned(
-                          top: 20,
-                          left: 16,
-                          child: GestureDetector(
-                            onTap: () => Navigator.pop(context),
-                            child: Container(
-                              width: 40,
-                              height: 40,
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(10),
-                                child: SvgPicture.asset(
-                                  'assets/images/go_back2.svg',
+                            // Back button
+                            Positioned(
+                              top: 20,
+                              left: 16,
+                              child: GestureDetector(
+                                onTap: () => Navigator.pop(context),
+                                child: Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: const BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(10),
+                                    child: SvgPicture.asset(
+                                      'assets/images/go_back2.svg',
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ),
 
-                        // Rating button
-                        if (canRateProduct)
-                          Positioned(
-                            top: 20,
-                            right: 16,
-                            child: GestureDetector(
-                              onTap: ratingLoading ? null : showRatingDialog,
-                              child: Container(
-                                width: 40,
-                                height: 40,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
+                            // Rating button
+                            if (canRateProduct)
+                              Positioned(
+                                top: 20,
+                                right: 16,
+                                child: GestureDetector(
+                                  onTap: ratingLoading
+                                      ? null
+                                      : showRatingDialog,
+                                  child: Container(
+                                    width: 40,
+                                    height: 40,
+                                    decoration: const BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: ratingLoading
+                                        ? const Padding(
+                                            padding: EdgeInsets.all(11),
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: Color(0xffE8A87C),
+                                            ),
+                                          )
+                                        : const Icon(
+                                            Icons.star_border_rounded,
+                                            color: Color(0xffE8A87C),
+                                            size: 25,
+                                          ),
+                                  ),
                                 ),
-                                child: ratingLoading
-                                    ? const Padding(
-                                        padding: EdgeInsets.all(11),
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          color: Color(0xffE8A87C),
-                                        ),
-                                      )
-                                    : const Icon(
-                                        Icons.star_border_rounded,
-                                        color: Color(0xffE8A87C),
-                                        size: 25,
-                                      ),
+                              ),
+
+                            // Dots
+                            Positioned(
+                              bottom: 10,
+                              left: 16,
+                              right: 16,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: List.generate(
+                                  images.isEmpty ? 1 : images.length,
+                                  (index) => dot(
+                                    index == currentPage,
+                                    _getType(product),
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
+                          ],
+                        ),
+                      ),
 
-                        // Dots
-                        Positioned(
-                          bottom: 10,
+                      const SizedBox(height: 19),
+
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Row(
+                          children: [
+                            tag(_getTagName(product)),
+                            const SizedBox(width: 8),
+                            tag(product.category?.name ?? ''),
+                          ],
+                        ),
+                      ),
+
+                      Padding(
+                        padding: const EdgeInsets.only(
                           left: 16,
                           right: 16,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: List.generate(
-                              images.isEmpty ? 1 : images.length,
-                              (index) =>
-                                  dot(index == currentPage, _getType(product)),
+                          bottom: 45,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 12),
+                            ProductInfo(
+                              product: product,
+                              auction: auction,
+                              remaining: remaining,
+                              auctionEnded: auctionEnded,
                             ),
-                          ),
+                            const SizedBox(height: 18),
+
+                            SellerInfo(
+                              owner: product.owner!,
+                              averageRating: calculateAverageRating(ratings),
+                              ratingsCount: ratings.length,
+                            ),
+
+                            const SizedBox(height: 18),
+
+                            ProductDescripion(
+                              description: product.description ?? '',
+                            ),
+
+                            const SizedBox(height: 80),
+
+                            bottomAction(
+                              context: context,
+                              text: _getActionText(product),
+                              product: product,
+                              isMyProduct: isMyProduct,
+                              isRequested: isRequested,
+                              isLoading: requestLoading,
+                              isCheckingRequest: checkingRequest,
+                              isAvailable: product.isAvailable ?? true,
+                              isClaimed: myClaims.any(
+                                (item) => item.id == product.id,
+                              ),
+                              purchaseLoading: purchaseLoading,
+                              onPurchase: () {
+                                handlePurchase(product);
+                              },
+                              onRequest: () {
+                                handleDonationRequest(product);
+                              },
+                              onEdit: () {
+                                _showEditBottomSheet(product);
+                              },
+                              onBid: auction == null
+                                  ? null
+                                  : (amount) {
+                                      handleBid(auction, amount);
+                                    },
+                              bidController: bidController,
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-
-                  const SizedBox(height: 19),
-
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Row(
-                      children: [
-                        tag(_getTagName(product)),
-                        const SizedBox(width: 8),
-                        tag(product.category?.name ?? ''),
-                      ],
-                    ),
+                ),
+              );
+            },
+          ),
+          if (bidLoading)
+            Positioned.fill(
+              child: AbsorbPointer(
+                absorbing: true,
+                child: Container(
+                  color: Colors.black.withValues(alpha: 0.35),
+                  child: const Center(
+                    child: CircularProgressIndicator(color: Color(0xffE8A87C)),
                   ),
-
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      left: 16,
-                      right: 16,
-                      bottom: 45,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 12),
-                        ProductInfo(
-                          product: product,
-                          auction: auction,
-                          remaining: remaining,
-                          auctionEnded: auctionEnded,
-                        ),
-                        const SizedBox(height: 18),
-
-                        SellerInfo(
-                          owner: product.owner!,
-                          averageRating: calculateAverageRating(ratings),
-                          ratingsCount: ratings.length,
-                        ),
-
-                        const SizedBox(height: 18),
-
-                        ProductDescripion(
-                          description: product.description ?? '',
-                        ),
-
-                        const SizedBox(height: 80),
-
-                        bottomAction(
-                          context: context,
-                          text: _getActionText(product),
-                          product: product,
-                          isMyProduct: isMyProduct,
-                          isRequested: isRequested,
-                          isLoading: requestLoading,
-                          isCheckingRequest: checkingRequest,
-                          isAvailable: product.isAvailable ?? true,
-                          isClaimed: myClaims.any((item) => item.id == product.id),
-                          purchaseLoading: purchaseLoading,
-                          onPurchase: () {
-                            handlePurchase(product);
-                          },
-                          onRequest: () {
-                            handleDonationRequest(product);
-                          },
-                          onEdit: () {
-                            _showEditBottomSheet(product);
-                          },
-                          onBid: auction == null
-                              ? null
-                              : (amount) {
-                                  handleBid(auction, amount);
-                                },
-                          bidController: bidController,
-
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
-          );
-        },
+        ],
       ),
     );
   }

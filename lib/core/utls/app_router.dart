@@ -4,6 +4,7 @@ import 'package:dealura/features/navigation/view/pages/main_page.dart';
 import 'package:dealura/features/notification/view/pages/notification_page.dart';
 import 'package:dealura/features/onboarding/view/pages/get_started_page.dart';
 import 'package:dealura/features/product/view/pages/product_details_page.dart';
+import 'package:dealura/features/profile/view/pages/Ratings_page.dart';
 import 'package:dealura/features/profile/view/pages/account_setting_page.dart';
 import 'package:dealura/features/profile/view/pages/balance_page.dart';
 import 'package:dealura/features/profile/view/pages/edit_profile_page.dart';
@@ -54,6 +55,10 @@ abstract class AppRouter {
       GoRoute(
         path: '/balance',
         builder: (context, state) => const BalancePage(),
+      ),
+      GoRoute(
+        path: '/ratings',
+        builder: (context, state) => const RatingsPage(),
       ),
     ],
   );

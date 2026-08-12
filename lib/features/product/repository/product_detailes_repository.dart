@@ -21,5 +21,9 @@ abstract class ProductDetailesRepository {
   Future<void> deleteProduct(int productId);
   Future<BidModel> createBid(int productId, int amount);
   Future<List<RatingModel>> getMyGivenRatings();
-  Future<Map<String, dynamic>> rateSellerFromClaimed(int itemId, int rate);
+  Future<Map<String, dynamic>> rateSellerFromClaimed(
+    int itemId,
+    int rate,
+    String comment,
+  );
 }

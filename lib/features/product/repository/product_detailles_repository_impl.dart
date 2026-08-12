@@ -113,9 +113,13 @@ class ProductDetaillesRepositoryImpl implements ProductDetailesRepository {
   Future<Map<String, dynamic>> rateSellerFromClaimed(
     int itemId,
     int rate,
+    String comment,
   ) async {
     final api = ApiService();
-    final response = await api.post('ratings/item/$itemId/', {'rating': rate});
+    final response = await api.post('ratings/item/$itemId/', {
+      'rating': rate,
+      'comment': comment,
+    });
 
     if (response is Map<String, dynamic>) {
       return response.data;

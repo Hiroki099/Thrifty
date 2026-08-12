@@ -541,8 +541,13 @@ class _ProfilePageState extends State<ProfilePage> {
                           BlendMode.srcIn,
                         ),
                       ),
-                      Text(
-                        "${user?.averageRating ?? 0} (${user?.ratingCount ?? 0})",
+                      GestureDetector(
+                        onTap: () {
+                          AppRouter.router.push('/ratings');
+                        },
+                        child: Text(
+                          "${user?.averageRating ?? 0} (${user?.ratingCount ?? 0}) >>",
+                        ),
                       ),
                     ],
                   ),

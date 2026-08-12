@@ -4,6 +4,7 @@ import 'package:dealura/core/utls/api_service.dart';
 import 'package:dealura/core/utls/save_token.dart';
 import 'package:dealura/features/auth/model/user_model.dart';
 import 'package:dealura/features/home/model/item_model.dart';
+import 'package:dealura/features/product/models/RatingModel.dart';
 import 'package:dealura/features/product/models/request_model.dart';
 import 'package:dealura/features/profile/model/transaction_model.dart';
 import 'package:dealura/features/profile/model/wallet_model.dart';
@@ -154,5 +155,28 @@ class ProfileRepositoryImpl implements ProfileRepository {
       'status': 'accepted',
     });
     return data;
+  }
+
+  @override
+  Future<List<RatingModel>> getMyGivenRatings() async {
+    final api = ApiService();
+    final data = await api.get(endpoint: 'ratings/my-given-ratings/');
+    return (data as List).map((e) => RatingModel.fromJson(e)).toList();
+  }
+
+  @override
+  Future<List<RatingModel>> getMyReceivedRatings() async {
+    final api = ApiService();
+    final data = await api.get(endpoint: 'ratings/my-received-ratings/');
+    return (data as List).map((e) => RatingModel.fromJson(e)).toList();
+  }
+
+  @override
+  Future<void> editRate(int? rateId, String? newComment, int? newRating) async {
+    final api = ApiService();
+    await api.patch('ratings/$rateId/', {
+      'comment': newComment,
+      'rating': newRating,
+    });
   }
 }

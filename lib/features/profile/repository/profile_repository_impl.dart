@@ -174,9 +174,15 @@ class ProfileRepositoryImpl implements ProfileRepository {
   @override
   Future<void> editRate(int? rateId, String? newComment, int? newRating) async {
     final api = ApiService();
-    await api.patch('ratings/$rateId/', {
+    await api.patch('ratings/$rateId/update/', {
       'comment': newComment,
       'rating': newRating,
     });
+  }
+
+  @override
+  Future<void> deleteRate(int? rateId) async {
+    final api = ApiService();
+    await api.delete('ratings/$rateId/delete/');
   }
 }

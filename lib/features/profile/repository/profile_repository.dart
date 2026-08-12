@@ -32,4 +32,6 @@ abstract class ProfileRepository {
     String? newComment,
     int? newRating,
   );
+Future<void> deleteRate(int? rateId);
+
 }

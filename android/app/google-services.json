@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "850456401538",
+    "project_id": "thrifty-099",
+    "storage_bucket": "thrifty-099.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:850456401538:android:fe54279e4ac3c67f62c69b",
+        "android_client_info": {
+          "package_name": "com.example.dealura"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJW9FbNfsok30ux24EdQnbqa6WPvI8KPk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

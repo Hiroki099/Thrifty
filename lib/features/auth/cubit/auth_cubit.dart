@@ -1,9 +1,11 @@
 import 'package:dealura/core/errors/failures.dart';
+import 'package:dealura/core/services/notification_services.dart';
 import 'package:dealura/core/utls/chat_client.dart';
 import 'package:dealura/core/utls/save_token.dart';
 import 'package:dealura/features/auth/cubit/auth_state.dart';
 import 'package:dealura/features/auth/repository/auth_repository.dart';
 import 'package:dealura/features/chat/repository/chat_repository_impl.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 
@@ -39,6 +41,7 @@ class AuthCubit extends Cubit<AuthState> {
     );
   }
 
+  
   Future<void> signIn({
     required String username,
     required String password,
@@ -47,8 +50,8 @@ class AuthCubit extends Cubit<AuthState> {
 
     final result = await repo.signIn(username: username, password: password);
 
-    result.fold(
-      (failure) {
+    await result.fold(
+      (failure) async {
         if (failure is ValidationFailure) {
           emit(AuthValidationError(failure.errors));
         } else {
@@ -56,59 +59,126 @@ class AuthCubit extends Cubit<AuthState> {
         }
       },
       (token) async {
-        print("ACCESS: ${token.access}");
-        print("REFRESH: ${token.refresh}");
-
-        await saveTokens(token.access!, token.refresh!);
-
         try {
+          debugPrint('========================================');
+          debugPrint('AUTH: LOGIN SUCCESS');
+          debugPrint('========================================');
+
+          debugPrint('ACCESS: ${token.access}');
+          debugPrint('REFRESH: ${token.refresh}');
+
+          await saveTokens(token.access!, token.refresh!);
+
+          debugPrint('AUTH: Auth tokens saved');
+
           final chatRepo = ChatRepositoryImpl();
+
+          debugPrint('AUTH: Getting Stream Chat credentials...');
+
           final chat = await chatRepo.getChatToken();
-          await saveChatTokens(chat);
+
+          debugPrint('AUTH: Stream credentials received');
+          debugPrint('AUTH: API KEY = ${chat.apiKey}');
+          debugPrint('AUTH: USER ID = ${chat.userId}');
+          debugPrint('AUTH: TOKEN EXISTS = ${chat.token != null}');
+
+      
           if (chat.apiKey == null ||
               chat.userId == null ||
               chat.token == null) {
-            print("Warning: Failed to initialize chat, proceeding with login");
+            debugPrint('AUTH: Stream credentials are incomplete.');
             emit(AuthSuccess());
             return;
           }
-          print('AUTH CUBIT: Initializing Stream Chat client');
-          print('  API Key: ${chat.apiKey}');
-          print('  User ID: ${chat.userId}');
-          print(
-            '  Current streamClient user: ${streamClient.state.currentUser?.id}',
-          );
 
-          if (streamClient.state.currentUser != null) {
-            print(
-              'AUTH CUBIT: Found existing connected user: ${streamClient.state.currentUser?.id}',
-            );
-          }
+       
+          await saveChatTokens(chat);
 
-          // Create new StreamChatClient instance
-          streamClient = StreamChatClient(chat.apiKey!, logLevel: Level.OFF);
+          debugPrint('AUTH: Stream credentials saved');
 
           try {
-            print('AUTH CUBIT: Connecting user to Stream Chat...');
-            await streamClient.connectUser(User(id: chat.userId!), chat.token!);
+            if (streamClient.state.currentUser != null) {
+              debugPrint(
+                'AUTH: Disconnecting previous Stream user '
+                '${streamClient.state.currentUser?.id}',
+              );
 
-            print(
-              'AUTH CUBIT: STREAM CONNECTED USER: '
-              '${streamClient.state.currentUser?.id}',
-            );
-
-            currentUserId = chat.userId;
-            print('AUTH CUBIT: currentUserId set to: $currentUserId');
-
-            emit(AuthSuccess());
+              await streamClient.disconnectUser();
+            }
           } catch (e) {
-            print("AUTH CUBIT ERROR: Failed to connect to stream chat: $e");
-            currentUserId = null;
+            debugPrint('AUTH: Previous Stream disconnect error: $e');
           }
 
+
+          streamClient = StreamChatClient(chat.apiKey!, logLevel: Level.OFF);
+
+          debugPrint('AUTH: Stream client created');
+
+
+          debugPrint(
+            'AUTH: Connecting Stream user '
+            '${chat.userId}...',
+          );
+
+          await streamClient.connectUser(User(id: chat.userId!), chat.token!);
+
+
+          final connectedUser = streamClient.state.currentUser;
+
+          if (connectedUser == null) {
+            debugPrint(
+              'AUTH: Stream connection returned '
+              'but currentUser is null.',
+            );
+
+            emit(AuthSuccess());
+            return;
+          }
+
+          debugPrint('========================================');
+
+          debugPrint('AUTH: STREAM CONNECTED');
+
+          debugPrint('AUTH: USER = ${connectedUser.id}');
+
+          debugPrint('========================================');
+
+          currentUserId = chat.userId!;
+
+
+          debugPrint('AUTH: Registering FCM device with Stream...');
+
+          await NotificationService.instance.registerStreamDevice();
+
+          debugPrint('AUTH: FCM device registration completed');
+
+
+          NotificationService.instance.listenToStreamMessages();
+
+          debugPrint('AUTH: Stream foreground listener started');
+
+
           emit(AuthSuccess());
-        } catch (e) {
-          print("Warning: Chat setup failed: $e");
+
+          debugPrint('========================================');
+
+          debugPrint('AUTH: COMPLETE LOGIN FLOW FINISHED');
+
+          debugPrint('========================================');
+        } catch (e, stackTrace) {
+          debugPrint('========================================');
+          debugPrint('AUTH: STREAM SETUP FAILED');
+
+          debugPrint('ERROR: $e');
+
+          debugPrint('STACKTRACE:');
+
+          debugPrint('$stackTrace');
+
+          debugPrint('========================================');
+
+          currentUserId = null;
+
           emit(AuthSuccess());
         }
       },

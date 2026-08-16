@@ -77,6 +77,18 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
         'CHAT DETAILS: Channel watch completed successfully.',
       );
 
+      // Filter out null messages to prevent UI errors
+      final currentState = widget.channel.state;
+      if (currentState != null) {
+        final validMessages = currentState.messages.where((msg) => 
+          msg != null && 
+          msg.user != null &&
+          msg.id != null
+        ).toList();
+        
+        debugPrint('CHAT DETAILS: Filtered ${validMessages.length} valid messages from ${currentState.messages.length} total');
+      }
+
      
       final channelState = widget.channel.state;
 

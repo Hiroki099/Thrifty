@@ -2,7 +2,8 @@ import 'package:dealura/core/utls/auth_interceptor.dart';
 import 'package:dio/dio.dart';
 
 class ApiService {
-  static const String _baseUrl = 'https://thrifty-api-9bfr.onrender.com/api/';
+  static const String _baseUrl =
+      'https://thrifty-grcgd6cjftd9ewef.germanywestcentral-01.azurewebsites.net/api/';
   final Dio _dio = Dio();
   ApiService() {
     if (_dio.interceptors.whereType<AuthInterceptor>().isEmpty) {

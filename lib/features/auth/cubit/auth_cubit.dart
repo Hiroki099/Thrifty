@@ -5,6 +5,7 @@ import 'package:dealura/core/utls/save_token.dart';
 import 'package:dealura/features/auth/cubit/auth_state.dart';
 import 'package:dealura/features/auth/repository/auth_repository.dart';
 import 'package:dealura/features/chat/repository/chat_repository_impl.dart';
+import 'package:dealura/main.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
@@ -41,7 +42,6 @@ class AuthCubit extends Cubit<AuthState> {
     );
   }
 
-  
   Future<void> signIn({
     required String username,
     required String password,
@@ -82,7 +82,6 @@ class AuthCubit extends Cubit<AuthState> {
           debugPrint('AUTH: USER ID = ${chat.userId}');
           debugPrint('AUTH: TOKEN EXISTS = ${chat.token != null}');
 
-      
           if (chat.apiKey == null ||
               chat.userId == null ||
               chat.token == null) {
@@ -91,7 +90,6 @@ class AuthCubit extends Cubit<AuthState> {
             return;
           }
 
-       
           await saveChatTokens(chat);
 
           debugPrint('AUTH: Stream credentials saved');
@@ -109,11 +107,10 @@ class AuthCubit extends Cubit<AuthState> {
             debugPrint('AUTH: Previous Stream disconnect error: $e');
           }
 
-
           streamClient = StreamChatClient(chat.apiKey!, logLevel: Level.OFF);
 
+           streamClientNotifier.value = streamClient; 
           debugPrint('AUTH: Stream client created');
-
 
           debugPrint(
             'AUTH: Connecting Stream user '
@@ -121,7 +118,6 @@ class AuthCubit extends Cubit<AuthState> {
           );
 
           await streamClient.connectUser(User(id: chat.userId!), chat.token!);
-
 
           final connectedUser = streamClient.state.currentUser;
 
@@ -136,49 +132,33 @@ class AuthCubit extends Cubit<AuthState> {
           }
 
           debugPrint('========================================');
-
           debugPrint('AUTH: STREAM CONNECTED');
-
           debugPrint('AUTH: USER = ${connectedUser.id}');
-
           debugPrint('========================================');
 
           currentUserId = chat.userId!;
 
-
           debugPrint('AUTH: Registering FCM device with Stream...');
-
           await NotificationService.instance.registerStreamDevice();
-
           debugPrint('AUTH: FCM device registration completed');
 
-
           NotificationService.instance.listenToStreamMessages();
-
           debugPrint('AUTH: Stream foreground listener started');
-
 
           emit(AuthSuccess());
 
           debugPrint('========================================');
-
           debugPrint('AUTH: COMPLETE LOGIN FLOW FINISHED');
-
           debugPrint('========================================');
         } catch (e, stackTrace) {
           debugPrint('========================================');
           debugPrint('AUTH: STREAM SETUP FAILED');
-
           debugPrint('ERROR: $e');
-
           debugPrint('STACKTRACE:');
-
           debugPrint('$stackTrace');
-
           debugPrint('========================================');
 
           currentUserId = null;
-
           emit(AuthSuccess());
         }
       },

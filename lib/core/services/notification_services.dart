@@ -533,9 +533,6 @@ class NotificationService {
 
   Timer? _keepAliveTimer;
 
-  /// ==========================================================
-  /// ACTIVE CHANNEL TRACKING
-  /// ==========================================================
   
   static String? _activeChannelId;
   
@@ -555,7 +552,6 @@ class NotificationService {
     _keepAliveTimer = Timer.periodic(Duration(seconds: 30), (timer) {
       if (streamClient.state.currentUser != null) {
         try {
-          // Send a simple query to keep WebSocket alive
           streamClient.queryUsers(
             filter: Filter.equal('id', streamClient.state.currentUser!.id),
           );
@@ -614,8 +610,6 @@ class NotificationService {
       return;
     }
 
-    // Check if user is currently viewing this channel
-    // If so, don't show notification
     if (_isUserInActiveChannel(cid)) {
       debugPrint('STREAM: User is in active channel, skipping notification');
       return;
@@ -631,9 +625,6 @@ class NotificationService {
     );
   }
 
-  /// ==========================================================
-  /// CHECK IF USER IN ACTIVE CHANNEL
-  /// ==========================================================
   
   bool _isUserInActiveChannel(String? channelId) {
     if (channelId == null || _activeChannelId == null) {
@@ -789,4 +780,29 @@ class NotificationService {
 
     _initialized = false;
   }
+
+
+  Future<void> disconnectStream() async {
+  try {
+    debugPrint('STREAM: Disconnecting user...');
+
+    stopStreamListener();
+
+    _keepAliveTimer?.cancel();
+    _keepAliveTimer = null;
+
+    if (streamClient.state.currentUser != null) {
+      await streamClient.disconnectUser();
+    }
+
+    currentUserId = null;
+
+    debugPrint('STREAM: User disconnected successfully');
+  } catch (e, stackTrace) {
+    debugPrint('STREAM: Disconnect failed: $e');
+    debugPrint('$stackTrace');
+  } finally {
+    _streamListenerStarted = false;
+  }
+}
 }

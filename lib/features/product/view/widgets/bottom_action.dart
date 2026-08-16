@@ -282,86 +282,202 @@ Widget bottomAction({
     );
   }
 }
-
-Future<void> openProductChat({
+  Future<void> openProductChat({
   required BuildContext context,
   required ItemModel product,
 }) async {
   try {
-    print('CHAT OPEN START: Item ID: ${product.id}');
-    print('CHAT OPEN: currentUserId from global: $currentUserId');
+    print('========================================');
+    print('CHAT OPEN START');
+    print('Item ID: ${product.id}');
+    print('Item Name: ${product.name}');
+    print('========================================');
+
     print(
-      'CHAT OPEN: Stream currentUser: ${streamClient.state.currentUser?.id}',
+      'CHAT OPEN: currentUserId from global: $currentUserId',
     );
 
-    // Update currentUserId from streamClient if it's null
-    if (currentUserId == null && streamClient.state.currentUser != null) {
+    print(
+      'CHAT OPEN: Stream currentUser: '
+      '${streamClient.state.currentUser?.id}',
+    );
+
+    // --------------------------------------------------
+    // Get current user ID
+    // --------------------------------------------------
+
+    if (currentUserId == null &&
+        streamClient.state.currentUser != null) {
       currentUserId = streamClient.state.currentUser?.id;
+
       print(
-        'CHAT OPEN: Updated currentUserId from streamClient: $currentUserId',
+        'CHAT OPEN: Updated currentUserId from Stream: '
+        '$currentUserId',
       );
     }
 
     if (currentUserId == null) {
-      print('CHAT OPEN ERROR: User not logged in');
+      print('CHAT OPEN ERROR: User is not logged in');
+
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Please log in to chat')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please log in to chat'),
+          ),
+        );
       }
+
       return;
     }
 
+    // --------------------------------------------------
+    // Seller ID
+    // --------------------------------------------------
+
     final sellerId = product.owner?.id?.toString();
 
-    if (sellerId == null) {
+    if (sellerId == null || sellerId.isEmpty) {
       print('CHAT OPEN ERROR: Seller ID is missing');
       throw Exception('Seller ID is missing');
     }
 
     if (sellerId == currentUserId) {
-      print('CHAT OPEN ERROR: User trying to chat with themselves');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('You cannot chat with yourself')),
+      print(
+        'CHAT OPEN ERROR: User trying to chat with themselves',
       );
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'You cannot chat with yourself',
+            ),
+          ),
+        );
+      }
+
       return;
     }
 
-    print('CHAT OPEN: Current user: $currentUserId, Seller: $sellerId');
-
-    final ids = [currentUserId!, sellerId]..sort();
-
-    final channelId = 'item-${product.id}-${ids[0]}-${ids[1]}';
-
-    print('CHAT OPEN: Creating channel with ID: $channelId');
-
-    final channel = streamClient.channel('messaging', id: channelId);
-
-    print('CHAT OPEN: Creating channel...');
-    await channel.create();
-    print('CHAT OPEN: Channel created successfully');
-
-    print('CHAT OPEN: Adding members: [$currentUserId, $sellerId]');
-    await channel.addMembers([currentUserId!, sellerId]);
-    print('CHAT OPEN: Members added successfully');
-
-    print('CHAT OPEN: Watching channel...');
-    await channel.watch();
-    print('CHAT OPEN: Channel watched successfully');
-
-    if (!context.mounted) return;
-
-    print('CHAT OPEN: Navigating to chat details...');
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => ChatDetailsPage(channel: channel)),
+    print(
+      'CHAT OPEN: Current user: $currentUserId',
     );
-  } catch (e) {
-    print('CHAT OPEN ERROR: $e');
-    if (!context.mounted) return;
 
-    ScaffoldMessenger.of(
+    print(
+      'CHAT OPEN: Seller: $sellerId',
+    );
+
+    // --------------------------------------------------
+    // Create deterministic channel ID
+    // --------------------------------------------------
+
+    final ids = [
+      currentUserId!,
+      sellerId,
+    ]..sort();
+
+    final channelId =
+        'item-${product.id}-${ids[0]}-${ids[1]}';
+
+    print(
+      'CHAT OPEN: Channel ID = $channelId',
+    );
+
+    // --------------------------------------------------
+    // Item name
+    // --------------------------------------------------
+
+    final itemName =
+        product.name?.trim() ?? '';
+
+    print(
+      'CHAT OPEN: Item name = "$itemName"',
+    );
+
+    // --------------------------------------------------
+    // Create channel
+    // --------------------------------------------------
+
+    final channel = streamClient.channel(
+      'messaging',
+      id: channelId,
+
+      // IMPORTANT:
+      // This is where we save the item name.
+      extraData: {
+        'item_name': itemName,
+      },
+    );
+
+    print(
+      'CHAT OPEN: Creating channel...',
+    );
+
+    await channel.create();
+
+    print(
+      'CHAT OPEN: Channel created successfully',
+    );
+
+    // --------------------------------------------------
+    // Add members
+    // --------------------------------------------------
+
+    print(
+      'CHAT OPEN: Adding members '
+      '[$currentUserId, $sellerId]',
+    );
+
+    await channel.addMembers([
+      currentUserId!,
+      sellerId,
+    ]);
+
+    print(
+      'CHAT OPEN: Members added successfully',
+    );
+
+    // --------------------------------------------------
+    // IMPORTANT:
+    // We intentionally do NOT call channel.watch()
+    // here.
+    //
+    // ChatDetailsPage will prepare/watch the channel.
+    // --------------------------------------------------
+
+    if (!context.mounted) {
+      return;
+    }
+
+    print(
+      'CHAT OPEN: Navigating to ChatDetailsPage',
+    );
+  Navigator.push(
       context,
-    ).showSnackBar(SnackBar(content: Text('Failed to open chat: $e')));
+      MaterialPageRoute(
+        builder: (_) => ChatDetailsPage(
+          channel: channel,
+        ),
+      ),
+    );
+  } catch (e, stackTrace) {
+    print('========================================');
+    print('CHAT OPEN ERROR');
+    print('ERROR: $e');
+    print('STACK TRACE:');
+    print(stackTrace);
+    print('========================================');
+
+    if (!context.mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Failed to open chat: $e',
+        ),
+      ),
+    );
   }
 }

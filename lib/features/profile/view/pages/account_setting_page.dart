@@ -70,15 +70,7 @@ class AccountSettingPage extends StatelessWidget {
               });
             },
           ),
-          ProfileButton(
-            text: "saved posts",
-            icon: SvgPicture.asset(
-              'assets/images/save.svg',
-              width: 24,
-              height: 24,
-            ),
-            onTap: () {},
-          ),
+       
         ],
       ),
     );

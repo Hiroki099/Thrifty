@@ -12,64 +12,36 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
+ValueNotifier<StreamChatClient> streamClientNotifier = ValueNotifier(streamClient);
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  debugPrint('MAIN: Firebase initialized');
-
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-
   await NotificationService.instance.initialize();
 
-  debugPrint('MAIN: NotificationService initialized');
-
   final chatToken = await getChatToken();
-
   final chatUserId = await getChatUserId();
-
   final chatApiKey = await getChatApiKey();
 
   if (chatToken != null && chatUserId != null && chatApiKey != null) {
-    debugPrint(
-      'MAIN: Initializing Stream Chat '
-      'with user $chatUserId',
-    );
-
     streamClient = StreamChatClient(chatApiKey, logLevel: Level.OFF);
+    streamClientNotifier.value = streamClient;
 
     try {
-      debugPrint('MAIN: Connecting user to Stream Chat...');
-
       await streamClient.connectUser(User(id: chatUserId), chatToken);
-
-      debugPrint(
-        'MAIN: STREAM USER CONNECTED: '
-        '${streamClient.state.currentUser?.id}',
-      );
-
       currentUserId = chatUserId;
-
       await NotificationService.instance.registerStreamDevice();
-
       NotificationService.instance.listenToStreamMessages();
-    } catch (e, stackTrace) {
+    } catch (e) {
       debugPrint('MAIN: STREAM AUTO CONNECT FAILED: $e');
-
-      debugPrint('MAIN: STACKTRACE: $stackTrace');
-
       currentUserId = null;
     }
   } else {
-    debugPrint('MAIN: No Stream Chat tokens found.');
-
     streamClient = StreamChatClient('placeholder', logLevel: Level.OFF);
-
-    currentUserId = null;
+    streamClientNotifier.value = streamClient;
   }
 
   runApp(const MyApp());
@@ -97,15 +69,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    debugPrint('MAIN: App lifecycle state changed to: $state');
-
     if (state == AppLifecycleState.resumed) {
-      // App resumed from background - re-register push device
-      debugPrint('MAIN: App resumed - re-initializing notifications');
       NotificationService.instance.onResume();
     } else if (state == AppLifecycleState.paused) {
-      // App going to background - stop WebSocket listener to avoid duplicate notifications
-      debugPrint('MAIN: App going to background - stopping WebSocket listener');
       NotificationService.instance.onPause();
     }
   }
@@ -118,16 +84,20 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           create: (context) => AuthCubit(AuthRepositoryImpl(ApiService())),
         ),
       ],
-      child: MaterialApp.router(
-        debugShowCheckedModeBanner: false,
-        title: 'Dealura',
-        theme: ThemeData(scaffoldBackgroundColor: const Color(0xFFFBF8F2)),
-        routerConfig: AppRouter.router,
-
-        builder: (context, child) {
-          return StreamChat(
-            client: streamClient,
-            child: child ?? const SizedBox.shrink(),
+      child: ValueListenableBuilder<StreamChatClient>(
+        valueListenable: streamClientNotifier,
+        builder: (context, currentClient, child) {
+          return MaterialApp.router(
+            debugShowCheckedModeBanner: false,
+            title: 'Dealura',
+            theme: ThemeData(scaffoldBackgroundColor: const Color(0xFFFBF8F2)),
+            routerConfig: AppRouter.router,
+            builder: (context, routerChild) {
+              return StreamChat(
+                client: currentClient,
+                child: routerChild ?? const SizedBox.shrink(),
+              );
+            },
           );
         },
       ),

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dealura/core/services/notification_services.dart';
 import 'package:dealura/core/utls/api_service.dart';
 import 'package:dealura/core/utls/save_token.dart';
 import 'package:dealura/features/auth/model/user_model.dart';
@@ -65,6 +66,12 @@ class ProfileRepositoryImpl implements ProfileRepository {
 
   @override
   Future<void> logOut() async {
+    try {
+      await NotificationService.instance.disconnectStream();
+    } catch (e) {
+      print('Logout Stream error: $e');
+    }
+
     await clearTokens();
   }
 

@@ -12,12 +12,31 @@ class ChatDetailsPage extends StatefulWidget {
   });
 
   @override
-  State<ChatDetailsPage> createState() => _ChatDetailsPageState();
+  State<ChatDetailsPage> createState() =>
+      _ChatDetailsPageState();
 }
 
-class _ChatDetailsPageState extends State<ChatDetailsPage> {
+class _ChatDetailsPageState
+    extends State<ChatDetailsPage> {
   bool _isLoading = true;
   String? _errorMessage;
+
+  String? get itemName {
+    final value =
+        widget.channel.extraData['item_name'];
+
+    if (value == null) {
+      return null;
+    }
+
+    final text = value.toString().trim();
+
+    if (text.isEmpty) {
+      return null;
+    }
+
+    return text;
+  }
 
   @override
   void initState() {
@@ -25,11 +44,25 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
     debugPrint('========================================');
     debugPrint('CHAT DETAILS INIT');
-    debugPrint('Channel ID: ${widget.channel.id}');
-    debugPrint('Channel CID: ${widget.channel.cid}');
-    debugPrint('Channel type: ${widget.channel.type}');
     debugPrint(
-      'Current user: ${streamClient.state.currentUser?.id}',
+      'Channel ID: ${widget.channel.id}',
+    );
+    debugPrint(
+      'Channel CID: ${widget.channel.cid}',
+    );
+    debugPrint(
+      'Channel type: ${widget.channel.type}',
+    );
+    debugPrint(
+      'Current user: '
+      '${streamClient.state.currentUser?.id}',
+    );
+    debugPrint(
+      'Item name: $itemName',
+    );
+    debugPrint(
+      'Extra data: '
+      '${widget.channel.extraData}',
     );
     debugPrint('========================================');
 
@@ -38,7 +71,12 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
   Future<void> _initializeChannel() async {
     try {
-      final currentUser = streamClient.state.currentUser;
+      // --------------------------------------------------
+      // Check Stream user
+      // --------------------------------------------------
+
+      final currentUser =
+          streamClient.state.currentUser;
 
       if (currentUser == null) {
         throw Exception(
@@ -47,10 +85,14 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
       }
 
       debugPrint(
-        'CHAT DETAILS: Current user = ${currentUser.id}',
+        'CHAT DETAILS: Current user = '
+        '${currentUser.id}',
       );
 
-  
+      // --------------------------------------------------
+      // Check CID
+      // --------------------------------------------------
+
       final cid = widget.channel.cid;
 
       if (cid == null || cid.isEmpty) {
@@ -63,70 +105,103 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
         'CHAT DETAILS: Preparing channel $cid',
       );
 
-  
+      // --------------------------------------------------
+      // Notification active channel
+      // --------------------------------------------------
+
       NotificationService.setActiveChannel(cid);
 
-    
-      debugPrint(
-        'CHAT DETAILS: Watching channel...',
-      );
+      // --------------------------------------------------
+      // Watch channel only when state is not available
+      // --------------------------------------------------
 
-      await widget.channel.watch();
-
-      debugPrint(
-        'CHAT DETAILS: Channel watch completed successfully.',
-      );
-
-      // Filter out null messages to prevent UI errors
-      final currentState = widget.channel.state;
-      if (currentState != null) {
-        final validMessages = currentState.messages.where((msg) => 
-          msg != null && 
-          msg.user != null &&
-          msg.id != null
-        ).toList();
-        
-        debugPrint('CHAT DETAILS: Filtered ${validMessages.length} valid messages from ${currentState.messages.length} total');
-      }
-
-     
-      final channelState = widget.channel.state;
-
-      debugPrint(
-        'CHAT DETAILS: Channel state available = '
-        '${channelState != null}',
-      );
-
-      if (channelState != null) {
+      if (widget.channel.state == null) {
         debugPrint(
-          'CHAT DETAILS: Members = '
-          '${channelState.members.length}',
+          'CHAT DETAILS: Channel state is null.',
         );
 
         debugPrint(
-          'CHAT DETAILS: Messages = '
-          '${channelState.messages.length}',
+          'CHAT DETAILS: Watching channel...',
         );
 
-        for (final member in channelState.members) {
-          debugPrint(
-            'Member: '
-            '${member.user?.id} / '
-            '${member.user?.name}',
-          );
-        }
+        await widget.channel.watch();
 
-        for (final message in channelState.messages) {
-          debugPrint(
-            'Message: '
-            '${message.id} / '
-            '${message.text} / '
-            '${message.user?.id}',
-          );
-        }
+        debugPrint(
+          'CHAT DETAILS: Channel watch completed.',
+        );
+      } else {
+        debugPrint(
+          'CHAT DETAILS: Channel state already available.',
+        );
       }
 
- 
+      // --------------------------------------------------
+      // Make sure state exists
+      // --------------------------------------------------
+
+      final channelState =
+          widget.channel.state;
+
+      if (channelState == null) {
+        throw Exception(
+          'Unable to load channel state.',
+        );
+      }
+
+      debugPrint(
+        'CHAT DETAILS: Channel state available.',
+      );
+
+      debugPrint(
+        'CHAT DETAILS: Members = '
+        '${channelState.members.length}',
+      );
+
+      debugPrint(
+        'CHAT DETAILS: Messages = '
+        '${channelState.messages.length}',
+      );
+
+      // --------------------------------------------------
+      // Debug members
+      // --------------------------------------------------
+  for (final member
+          in channelState.members) {
+        debugPrint(
+          'Member: '
+          '${member.user?.id} / '
+          '${member.user?.name}',
+        );
+      }
+
+      // --------------------------------------------------
+      // Debug messages
+      // --------------------------------------------------
+
+      for (final message
+          in channelState.messages) {
+        debugPrint(
+          'Message: '
+          '${message.id} / '
+          '${message.text} / '
+          '${message.user?.id}',
+        );
+      }
+
+      // --------------------------------------------------
+      // Debug extra data
+      // --------------------------------------------------
+
+      debugPrint(
+        'CHAT DETAILS: Extra data = '
+        '${widget.channel.extraData}',
+      );
+
+      debugPrint(
+        'CHAT DETAILS: Item name = '
+        '$itemName',
+      );
+
       if (!mounted) {
         return;
       }
@@ -135,8 +210,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
         _isLoading = false;
         _errorMessage = null;
       });
-  debugPrint(
-        'CHAT DETAILS: Initialization completed successfully.',
+
+      debugPrint(
+        'CHAT DETAILS: Initialization completed.',
       );
     } catch (e, stackTrace) {
       debugPrint('========================================');
@@ -183,8 +259,15 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isTablet = screenWidth > 600;
+    final screenWidth =
+        MediaQuery.of(context).size.width;
+
+    final isTablet =
+        screenWidth > 600;
+
+    // --------------------------------------------------
+    // Invalid channel
+    // --------------------------------------------------
 
     if (widget.channel.id == null) {
       return _buildErrorScreen(
@@ -192,16 +275,26 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
       );
     }
 
+    // --------------------------------------------------
+    // Loading
+    // --------------------------------------------------
+
     if (_isLoading) {
       return Scaffold(
-        backgroundColor: const Color(0xFFFBF8F2),
+        backgroundColor:
+            const Color(0xFFFBF8F2),
         body: const SafeArea(
           child: Center(
-            child: CircularProgressIndicator(),
+            child:
+                CircularProgressIndicator(),
           ),
         ),
       );
     }
+
+    // --------------------------------------------------
+    // Error
+    // --------------------------------------------------
 
     if (_errorMessage != null) {
       return _buildErrorScreen(
@@ -210,6 +303,9 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
       );
     }
 
+    // --------------------------------------------------
+    // State check
+    // --------------------------------------------------
 
     if (widget.channel.state == null) {
       return _buildErrorScreen(
@@ -218,26 +314,43 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
       );
     }
 
+    // --------------------------------------------------
+    // Chat
+    // --------------------------------------------------
+
     return StreamChannel(
       channel: widget.channel,
       child: Scaffold(
-        backgroundColor: const Color(0xFFFBF8F2),
-
+        backgroundColor:
+            const Color(0xFFFBF8F2),
         body: SafeArea(
           child: Column(
             children: [
-      
+              // ------------------------------------------------
+              // Header
+              // ------------------------------------------------
+
               const StreamChannelHeader(),
 
-              Expanded(
+              // ------------------------------------------------
+              // Messages
+              // ------------------------------------------------
+  Expanded(
                 child: Padding(
                   padding: EdgeInsets.symmetric(
-                    horizontal: isTablet ? 24.0 : 16.0,
-                    vertical: isTablet ? 16.0 : 8.0,
+                    horizontal:
+                        isTablet ? 24.0 : 16.0,
+                    vertical:
+                        isTablet ? 16.0 : 8.0,
                   ),
-                  child: const StreamMessageListView(),
+                  child:
+                      const StreamMessageListView(),
                 ),
               ),
+
+              // ------------------------------------------------
+              // Composer
+              // ------------------------------------------------
 
               Padding(
                 padding: EdgeInsets.only(
@@ -246,7 +359,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                   top: 8.0,
                   bottom: isTablet ? 16.0 : 8.0,
                 ),
-                child:  StreamMessageComposer(),
+                child:
+                     StreamMessageComposer(),
               ),
             ],
           ),
@@ -254,18 +368,22 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
       ),
     );
   }
+
   Widget _buildErrorScreen(
     String message, {
     bool showRetry = false,
   }) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFBF8F2),
+      backgroundColor:
+          const Color(0xFFFBF8F2),
       body: SafeArea(
         child: Center(
           child: Padding(
-            padding: const EdgeInsets.all(24),
+            padding:
+                const EdgeInsets.all(24),
             child: Column(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisSize:
+                  MainAxisSize.min,
               children: [
                 const Icon(
                   Icons.chat_bubble_outline,
@@ -279,9 +397,11 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                   'Unable to open chat',
                   style: TextStyle(
                     fontSize: 20,
-                    fontWeight: FontWeight.w600,
+                    fontWeight:
+                        FontWeight.w600,
                   ),
-                  textAlign: TextAlign.center,
+                  textAlign:
+                      TextAlign.center,
                 ),
 
                 const SizedBox(height: 10),
@@ -292,7 +412,8 @@ class _ChatDetailsPageState extends State<ChatDetailsPage> {
                     fontSize: 14,
                     color: Colors.grey,
                   ),
-                  textAlign: TextAlign.center,
+                  textAlign:
+                      TextAlign.center,
                 ),
 
                 if (showRetry) ...[

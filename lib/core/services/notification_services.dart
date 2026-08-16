@@ -533,6 +533,22 @@ class NotificationService {
 
   Timer? _keepAliveTimer;
 
+  /// ==========================================================
+  /// ACTIVE CHANNEL TRACKING
+  /// ==========================================================
+  
+  static String? _activeChannelId;
+  
+  static void setActiveChannel(String? channelId) {
+    _activeChannelId = channelId;
+    debugPrint('STREAM: Active channel set to: $channelId');
+  }
+  
+  static void clearActiveChannel() {
+    debugPrint('STREAM: Active channel cleared');
+    _activeChannelId = null;
+  }
+
   void _startKeepAliveTimer() {
     _keepAliveTimer?.cancel();
 
@@ -598,6 +614,13 @@ class NotificationService {
       return;
     }
 
+    // Check if user is currently viewing this channel
+    // If so, don't show notification
+    if (_isUserInActiveChannel(cid)) {
+      debugPrint('STREAM: User is in active channel, skipping notification');
+      return;
+    }
+
     final senderName = message.user?.name ?? 'Dealura';
 
     await _showNotification(
@@ -606,6 +629,25 @@ class NotificationService {
       payload: {'type': 'chat', 'cid': cid, 'message_id': message.id},
       id: message.id.hashCode,
     );
+  }
+
+  /// ==========================================================
+  /// CHECK IF USER IN ACTIVE CHANNEL
+  /// ==========================================================
+  
+  bool _isUserInActiveChannel(String? channelId) {
+    if (channelId == null || _activeChannelId == null) {
+      return false;
+    }
+    
+    // Check if the incoming message is from the currently active channel
+    final isActive = channelId == _activeChannelId;
+    
+    if (isActive) {
+      debugPrint('STREAM: Message from active channel, skipping notification');
+    }
+    
+    return isActive;
   }
 
   void _listenToNotificationTap() {

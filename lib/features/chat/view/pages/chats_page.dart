@@ -71,7 +71,12 @@ class _ChatsPageState extends State<ChatsPage> {
     final isTablet = screenWidth > 600;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Messages')),
+      backgroundColor: const Color(0xFFFBF8F2),
+      appBar: AppBar(
+        title: const Text('Messages'),
+        backgroundColor: const Color(0xFFFBF8F2),
+        elevation: 0,
+      ),
       body: Padding(
         padding: EdgeInsets.symmetric(
           horizontal: isTablet ? 24.0 : 16.0,

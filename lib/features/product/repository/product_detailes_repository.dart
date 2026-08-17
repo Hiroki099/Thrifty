@@ -26,4 +26,5 @@ abstract class ProductDetailesRepository {
     int rate,
     String comment,
   );
+  Future<List<BidModel>> getBids(int auctionId);
 }

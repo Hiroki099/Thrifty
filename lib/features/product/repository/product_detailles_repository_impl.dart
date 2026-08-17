@@ -138,4 +138,15 @@ class ProductDetaillesRepositoryImpl implements ProductDetailesRepository {
 
     return {};
   }
+
+  @override
+  Future<List<BidModel>> getBids(int auctionId) {
+    final api = ApiService();
+    return api
+        .get(endpoint: 'items/auctions/$auctionId/bids/')
+        .then(
+          (data) =>
+              (data as List).map((item) => BidModel.fromJson(item)).toList(),
+        );
+  }
 }

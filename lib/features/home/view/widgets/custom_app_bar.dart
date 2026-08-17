@@ -37,23 +37,9 @@ class CustomAppBar extends StatelessWidget {
           ),
           Row(
             children: [
-              GestureDetector(onTap: () => AppRouter.router.push('/exchange'),
-                child: SvgPicture.asset('assets/images/exchange.svg'),
-              ),
-              SizedBox(width: 15),
               GestureDetector(
-                onTap: () {
-                  AppRouter.router.push('/notifications');
-                },
-                child: Container(
-                  height: 30,
-                  width: 28,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Color(0xffE7A072), width: 1),
-                  ),
-                  child: Image.asset('assets/images/Bell_icon.png'),
-                ),
+                onTap: () => AppRouter.router.push('/exchange'),
+                child: SvgPicture.asset('assets/images/exchange.svg'),
               ),
             ],
           ),

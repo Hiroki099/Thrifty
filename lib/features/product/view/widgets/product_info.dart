@@ -7,12 +7,14 @@ class ProductInfo extends StatelessWidget {
   final AuctionModel? auction;
   final Duration remaining;
   final bool auctionEnded;
+  final VoidCallback? onBidPressed;
   const ProductInfo({
     super.key,
     required this.product,
     this.auction,
     required this.remaining,
     required this.auctionEnded,
+    this.onBidPressed,
   });
   @override
   Widget build(BuildContext context) {
@@ -125,14 +127,17 @@ class ProductInfo extends StatelessWidget {
             clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(),
           ),
-          Text(
-            'Current : ${auction?.currentPrice ?? auction?.startPrice ?? "0"} SYP',
-            style: TextStyle(
-              color: const Color(0xFF8B7EC8),
-              fontSize: 20,
-              fontFamily: 'IBM Plex Sans',
-              fontWeight: FontWeight.w700,
-              height: 0.68,
+          GestureDetector(
+            onTap: onBidPressed,
+            child: Text(
+              'Current : ${auction?.currentPrice ?? auction?.startPrice ?? "0"} SYP',
+              style: TextStyle(
+                color: const Color(0xFF8B7EC8),
+                fontSize: 20,
+                fontFamily: 'IBM Plex Sans',
+                fontWeight: FontWeight.w700,
+                height: 0.68,
+              ),
             ),
           ),
           SizedBox(height: 18),

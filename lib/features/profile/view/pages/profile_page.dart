@@ -1,6 +1,7 @@
 import 'package:dealura/core/utls/app_router.dart';
 import 'package:dealura/features/auth/model/user_model.dart';
 import 'package:dealura/features/home/model/item_model.dart';
+import 'package:dealura/features/product/models/bid_model.dart';
 import 'package:dealura/features/product/models/request_model.dart';
 import 'package:dealura/features/product/view/widgets/product_card.dart';
 import 'package:dealura/features/profile/model/wallet_model.dart';
@@ -368,6 +369,7 @@ class _ProfilePageState extends State<ProfilePage> {
   List<ItemModel> myItems = [];
   List<ItemModel> myClaims = [];
   List<ItemModel> myRequests = [];
+  List<BidModel> myBids = [];
   @override
   void initState() {
     super.initState();
@@ -384,6 +386,7 @@ class _ProfilePageState extends State<ProfilePage> {
       repo.getMyClaims(),
       repo.getMyRequests(),
       repo.getRecivedRequests(),
+      repo.getMyBids(),
     ]);
 
     user = results[0] as UserModel;
@@ -399,6 +402,8 @@ class _ProfilePageState extends State<ProfilePage> {
           request.itemDetails?.listingType == 'donation';
     }).toList();
 
+    myBids = results[6] as List<BidModel>;
+
     if (!mounted) return;
 
     setState(() {
@@ -412,7 +417,7 @@ class _ProfilePageState extends State<ProfilePage> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Scaffold(
         body: SafeArea(
           child: SingleChildScrollView(
@@ -585,10 +590,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                 SvgPicture.asset("assets/images/pen.svg"),
                                 const SizedBox(width: 2),
                                 const Text(
-                                  "Edit profile",
+                                  "Profile settings",
                                   style: TextStyle(
                                     fontFamily: "IBM Plex Sans",
-                                    fontSize: 13,
+                                    fontSize: 10,
                                     fontWeight: FontWeight.w400,
                                     color: Color(0xFFFFFFFF),
                                   ),
@@ -655,6 +660,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       Tab(text: "Listings"),
                       Tab(text: "Your items"),
                       Tab(text: "Requests"),
+                      Tab(text: "Bids"),
                     ],
                   ),
 
@@ -715,6 +721,19 @@ class _ProfilePageState extends State<ProfilePage> {
                                   return ProductCard(item: myRequests[index]);
                                 },
                               ),
+                        myBids.isEmpty
+                            ? const Center(child: Text("No bids yet"))
+                            : ListView.separated(
+                                itemCount: myBids.length,
+                                separatorBuilder: (_, __) =>
+                                    const SizedBox(height: 12),
+                                itemBuilder: (context, index) {
+                                  return _BidItem(
+                                    bid: myBids[index],
+                                    index: index,
+                                  );
+                                },
+                              ),
                       ],
                     ),
                   ),
@@ -767,4 +786,135 @@ String formatBalance(String balance) {
   }
 
   return isNegative ? "-$formatted" : formatted;
+}
+
+class _BidItem extends StatelessWidget {
+  final BidModel bid;
+  final int index;
+
+  const _BidItem({required this.bid, required this.index});
+
+  @override
+  Widget build(BuildContext context) {
+    final user = bid.bidderUser;
+
+    final profilePicture = user?.profilePictureUrl;
+
+    final amount = bid.bidAmount ?? '0';
+
+    String dateText = '';
+
+    if (bid.bidDate != null) {
+      final date = bid.bidDate!.toLocal();
+
+      final hour = date.hour.toString().padLeft(2, '0');
+      final minute = date.minute.toString().padLeft(2, '0');
+
+      dateText =
+          '${date.year}-${date.month.toString().padLeft(2, '0')}-'
+          '${date.day.toString().padLeft(2, '0')} '
+          '$hour:$minute';
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(
+              color: Color(0xFFEEEBF7),
+              shape: BoxShape.circle,
+            ),
+            child: Text(
+              '${index + 1}',
+              style: const TextStyle(
+                color: Color(0xFF8B7EC8),
+                fontSize: 13,
+                fontFamily: 'IBM Plex Sans',
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+
+          const SizedBox(width: 12),
+
+          ClipOval(
+            child: SizedBox(
+              width: 42,
+              height: 42,
+              child: profilePicture != null && profilePicture.isNotEmpty
+                  ? Image.network(
+                      profilePicture,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, _, _) {
+                        return Container(
+                          color: const Color(0xFFEEEBF7),
+                          child: const Icon(
+                            Icons.person,
+                            color: Color(0xFF8B7EC8),
+                          ),
+                        );
+                      },
+                    )
+                  : Container(
+                      color: const Color(0xFFEEEBF7),
+                      child: const Icon(Icons.person, color: Color(0xFF8B7EC8)),
+                    ),
+            ),
+          ),
+
+          const SizedBox(width: 12),
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "${bid.item!.name}",
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 15,
+                    fontFamily: 'IBM Plex Sans',
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+
+                if (dateText.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    dateText,
+                    style: const TextStyle(
+                      color: Color(0xFFB5B0A8),
+                      fontSize: 12,
+                      fontFamily: 'IBM Plex Sans',
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+
+          const SizedBox(width: 8),
+          Text(
+            '$amount SYP',
+            style: const TextStyle(
+              color: Color(0xFF8B7EC8),
+              fontSize: 16,
+              fontFamily: 'IBM Plex Sans',
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

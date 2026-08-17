@@ -2,6 +2,7 @@ import 'package:dealura/features/auth/model/user_model.dart';
 import 'package:dealura/features/home/model/item_model.dart';
 import 'package:dealura/features/product/models/RatingModel.dart';
 import 'package:dealura/features/product/models/auction_model.dart';
+import 'package:dealura/features/product/models/bid_model.dart';
 import 'package:dealura/features/product/models/image_model/image_model.dart';
 import 'package:dealura/features/product/repository/product_detailles_repository_impl.dart';
 import 'package:dealura/features/product/view/widgets/Rating_bottom_sheet.dart';
@@ -47,6 +48,22 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     final comment = result['comment'] as String;
 
     await rateProduct(rating, comment);
+  }
+
+  Future<void> showBids(AuctionModel auction) async {
+    if (auction.id == null) return;
+
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: const Color(0xffFBF8F2),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (context) {
+        return _BidsBottomSheet(auctionId: auction.id!);
+      },
+    );
   }
 
   Future<void> rateProduct(int rating, String comment) async {
@@ -713,6 +730,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                               auction: auction,
                               remaining: remaining,
                               auctionEnded: auctionEnded,
+                              onBidPressed: () async {
+                                await showBids(auction!);
+                              },
                             ),
                             const SizedBox(height: 18),
 
@@ -847,4 +867,249 @@ double calculateAverageRating(List<RatingModel> ratings) {
   final total = ratings.fold<int>(0, (sum, r) => sum + (r.rating ?? 0));
 
   return total / ratings.length;
+}
+
+class _BidsBottomSheet extends StatefulWidget {
+  final int auctionId;
+
+  const _BidsBottomSheet({required this.auctionId});
+
+  @override
+  State<_BidsBottomSheet> createState() => _BidsBottomSheetState();
+}
+
+class _BidsBottomSheetState extends State<_BidsBottomSheet> {
+  late Future<List<BidModel>> bidsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+
+    bidsFuture = ProductDetaillesRepositoryImpl().getBids(widget.auctionId);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: SizedBox(
+        height: MediaQuery.of(context).size.height * 0.75,
+        child: Column(
+          children: [
+            const SizedBox(height: 12),
+
+            Container(
+              width: 45,
+              height: 5,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade400,
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            const Text(
+              'All bids',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 20,
+                fontFamily: 'IBM Plex Sans',
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            Expanded(
+              child: FutureBuilder<List<BidModel>>(
+                future: bidsFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: Color(0xff8B7EC8),
+                      ),
+                    );
+                  }
+
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Text(
+                        'Failed to load bids',
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontFamily: 'IBM Plex Sans',
+                        ),
+                      ),
+                    );
+                  }
+
+                  final bids = snapshot.data ?? [];
+
+                  if (bids.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'No bids yet',
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontFamily: 'IBM Plex Sans',
+                        ),
+                      ),
+                    );
+                  }
+
+                  return ListView.separated(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    itemCount: bids.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                    itemBuilder: (context, index) {
+                      return _BidItem(bid: bids[index], index: index);
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _BidItem extends StatelessWidget {
+  final BidModel bid;
+  final int index;
+
+  const _BidItem({required this.bid, required this.index});
+
+  @override
+  Widget build(BuildContext context) {
+    final user = bid.bidderUser;
+
+    final username =
+        user?.username ??
+        (bid.bidder != null ? 'User #${bid.bidder}' : 'Unknown user');
+
+    final profilePicture = user?.profilePictureUrl;
+
+    final amount = bid.bidAmount ?? '0';
+
+    String dateText = '';
+
+    if (bid.bidDate != null) {
+      final date = bid.bidDate!.toLocal();
+
+      final hour = date.hour.toString().padLeft(2, '0');
+      final minute = date.minute.toString().padLeft(2, '0');
+
+      dateText =
+          '${date.year}-${date.month.toString().padLeft(2, '0')}-'
+          '${date.day.toString().padLeft(2, '0')} '
+          '$hour:$minute';
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(
+              color: Color(0xFFEEEBF7),
+              shape: BoxShape.circle,
+            ),
+            child: Text(
+              '${index + 1}',
+              style: const TextStyle(
+                color: Color(0xFF8B7EC8),
+                fontSize: 13,
+                fontFamily: 'IBM Plex Sans',
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+
+          const SizedBox(width: 12),
+
+          ClipOval(
+            child: SizedBox(
+              width: 42,
+              height: 42,
+              child: profilePicture != null && profilePicture.isNotEmpty
+                  ? Image.network(
+                      profilePicture,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, _, _) {
+                        return Container(
+                          color: const Color(0xFFEEEBF7),
+                          child: const Icon(
+                            Icons.person,
+                            color: Color(0xFF8B7EC8),
+                          ),
+                        );
+                      },
+                    )
+                  : Container(
+                      color: const Color(0xFFEEEBF7),
+                      child: const Icon(Icons.person, color: Color(0xFF8B7EC8)),
+                    ),
+            ),
+          ),
+
+          const SizedBox(width: 12),
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  username,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 15,
+                    fontFamily: 'IBM Plex Sans',
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+
+                if (dateText.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    dateText,
+                    style: const TextStyle(
+                      color: Color(0xFFB5B0A8),
+                      fontSize: 12,
+                      fontFamily: 'IBM Plex Sans',
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+
+          const SizedBox(width: 8),
+          Text(
+            '$amount SYP',
+            style: const TextStyle(
+              color: Color(0xFF8B7EC8),
+              fontSize: 16,
+              fontFamily: 'IBM Plex Sans',
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

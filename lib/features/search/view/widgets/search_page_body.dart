@@ -49,6 +49,10 @@ class _SearchPageBodyState extends State<SearchPageBody> {
   }
 
   Future<void> loadData() async {
+    setState(() {
+      isLoading = true;
+    });
+
     categories = await repository.getCategoriesList();
 
     items = await repository.getItemsList(null, selectedCategoryId, null, null);
@@ -143,7 +147,16 @@ class _SearchPageBodyState extends State<SearchPageBody> {
                           childAspectRatio: 171 / 236,
                         ),
                     itemBuilder: (context, index) {
-                      return ProductCard(item: items[index]);
+                      return ProductCard(
+                        item: items[index],
+                        onRefresh: () {
+                          if (search.isNotEmpty) {
+                            searchItems(search);
+                          } else {
+                            loadData();
+                          }
+                        },
+                      );
                     },
                   ),
           ),

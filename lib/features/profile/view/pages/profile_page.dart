@@ -377,6 +377,10 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> loadProfile() async {
+    setState(() {
+      isLoading = true;
+    });
+
     final repo = ProfileRepositoryImpl();
 
     final results = await Future.wait([
@@ -683,7 +687,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                       childAspectRatio: 0.72,
                                     ),
                                 itemBuilder: (context, index) {
-                                  return ProductCard(item: myItems[index]);
+                                  return ProductCard(
+                                    item: myItems[index],
+                                    onRefresh: loadProfile,
+                                  );
                                 },
                               ),
 
@@ -701,7 +708,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                       childAspectRatio: 171 / 236,
                                     ),
                                 itemBuilder: (context, index) {
-                                  return ProductCard(item: myClaims[index]);
+                                  return ProductCard(
+                                    item: myClaims[index],
+                                    onRefresh: loadProfile,
+                                  );
                                 },
                               ),
                         myRequests.isEmpty
@@ -718,7 +728,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                       childAspectRatio: 171 / 236,
                                     ),
                                 itemBuilder: (context, index) {
-                                  return ProductCard(item: myRequests[index]);
+                                  return ProductCard(
+                                    item: myRequests[index],
+                                    onRefresh: loadProfile,
+                                  );
                                 },
                               ),
                         myBids.isEmpty

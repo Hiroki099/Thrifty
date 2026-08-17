@@ -4,8 +4,9 @@ import 'package:go_router/go_router.dart';
 
 class ProductCard extends StatelessWidget {
   final ItemModel item;
+  final VoidCallback? onRefresh;
 
-  const ProductCard({super.key, required this.item});
+  const ProductCard({super.key, required this.item, this.onRefresh});
 
   @override
   Widget build(BuildContext context) {
@@ -27,8 +28,11 @@ class ProductCard extends StatelessWidget {
     }
 
     return GestureDetector(
-      onTap: () {
-        context.push('/product_details', extra: item.id);
+      onTap: () async {
+        final result = await context.push<bool>('/product_details', extra: item.id);
+        if (result == true && context.mounted) {
+          onRefresh?.call();
+        }
       },
       child: Container(
         width: 171,

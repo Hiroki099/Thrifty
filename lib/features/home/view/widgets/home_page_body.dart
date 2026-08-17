@@ -33,6 +33,10 @@ class _HomePageBodyState extends State<HomePageBody> {
   }
 
   Future<void> loadInitialData() async {
+    setState(() {
+      isLoading = true;
+    });
+
     categories = await repository.getCategoriesList();
 
     items = await repository.getItemsList(null, null, null);
@@ -146,7 +150,10 @@ class _HomePageBodyState extends State<HomePageBody> {
                     childAspectRatio: 171 / 236,
                   ),
                   itemBuilder: (context, index) {
-                    return ProductCard(item: items[index]);
+                    return ProductCard(
+                      item: items[index],
+                      onRefresh: loadInitialData,
+                    );
                   },
                 ),
               ),

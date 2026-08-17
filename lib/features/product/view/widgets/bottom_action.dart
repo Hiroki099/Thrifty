@@ -17,50 +17,90 @@ Widget bottomAction({
   VoidCallback? onRequest,
   VoidCallback? onEdit,
   ValueChanged<int>? onBid,
+  VoidCallback? onDelete,
+  bool deleteLoading = false,
   required BuildContext context,
   TextEditingController? bidController,
 }) {
   if (isMyProduct) {
+    final canDelete = isAvailable && product.listingType != 'auction';
+
     Color color;
 
     switch (text) {
       case "Buy now":
-        color = const Color(0xffE8A87C); // Sale
+        color = const Color(0xffE8A87C);
         break;
 
       case "Place bid":
-        color = const Color(0xFF8B7EC8); // Auction
+        color = const Color(0xFF8B7EC8);
         break;
 
       default:
-        color = const Color(0xff5BAB8B); // Donation
+        color = const Color(0xff5BAB8B);
     }
 
     return Container(
       decoration: const BoxDecoration(color: Color(0xffFBF8F2)),
-      child: SizedBox(
-        height: 53,
-        width: double.infinity,
-        child: ElevatedButton.icon(
-          onPressed: onEdit,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: color,
-            foregroundColor: Colors.white,
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+      child: Row(
+        children: [
+          Expanded(
+            child: SizedBox(
+              height: 53,
+              child: ElevatedButton.icon(
+                onPressed: onEdit,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: color,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                icon: const Icon(Icons.edit_outlined),
+                label: const Text(
+                  "Edit Product",
+                  style: TextStyle(
+                    fontFamily: "IBM Plex Sans",
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
             ),
           ),
-          icon: const Icon(Icons.edit_outlined),
-          label: const Text(
-            "Edit Product",
-            style: TextStyle(
-              fontFamily: "IBM Plex Sans",
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
+
+          if (canDelete) ...[
+            const SizedBox(width: 10),
+
+            SizedBox(
+              width: 53,
+              height: 53,
+              child: ElevatedButton(
+                onPressed: deleteLoading ? null : onDelete,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red.shade400,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  padding: EdgeInsets.zero,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: deleteLoading
+                    ? const SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Icon(Icons.delete_outline, size: 25),
+              ),
             ),
-          ),
-        ),
+          ],
+        ],
       ),
     );
   }

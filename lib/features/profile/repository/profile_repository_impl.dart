@@ -214,4 +214,10 @@ class ProfileRepositoryImpl implements ProfileRepository {
           (data) => (data as List).map((e) => ReportModel.fromJson(e)).toList(),
         );
   }
+
+  @override
+  Future<void> deleteMyItem(int productId)async {
+    final api = ApiService();
+    await api.delete('items/$productId/delete/');
+  }
 }

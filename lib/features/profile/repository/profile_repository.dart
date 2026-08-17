@@ -33,4 +33,5 @@ abstract class ProfileRepository {
   Future<void> deleteRate(int? rateId);
   Future<List<BidModel>> getMyBids();
   Future<List<ReportModel>> getMyReports();
+  Future<void> deleteMyItem(int productId);
 }

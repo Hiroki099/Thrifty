@@ -29,6 +29,64 @@ class ProductDetailsPage extends StatefulWidget {
 }
 
 class _ProductDetailsPageState extends State<ProductDetailsPage> {
+  bool deleteLoading = false;
+  Future<void> handleDeleteProduct(ItemModel product) async {
+    if (deleteLoading) return;
+
+    setState(() {
+      deleteLoading = true;
+    });
+
+    try {
+      final repo = ProfileRepositoryImpl();
+
+      await repo.deleteMyItem(product.id!);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Product deleted successfully'),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      Navigator.pop(context, true);
+    } on DioException catch (e) {
+      print('DELETE PRODUCT ERROR: ${e.response?.statusCode}');
+      print('DELETE PRODUCT DATA: ${e.response?.data}');
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            e.response?.data?['detail']?.toString() ??
+                'Failed to delete product',
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (e) {
+      print('DELETE PRODUCT ERROR: $e');
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to delete product'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          deleteLoading = false;
+        });
+      }
+    }
+  }
+
   Future<void> showRatingDialog() async {
     final result = await showModalBottomSheet<Map<String, dynamic>>(
       context: context,
@@ -78,7 +136,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
   ) async {
     try {
       final repo = ProductDetaillesRepositoryImpl();
-     await repo.createReport(productId, description, reason);
+      await repo.createReport(productId, description, reason);
 
       if (!mounted) return;
 
@@ -830,6 +888,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                                       handleBid(auction, amount);
                                     },
                               bidController: bidController,
+                              deleteLoading: deleteLoading,
+                              onDelete: () {
+                                handleDeleteProduct(product);
+                              },
                             ),
                           ],
                         ),

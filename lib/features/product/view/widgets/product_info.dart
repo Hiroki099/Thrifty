@@ -8,6 +8,7 @@ class ProductInfo extends StatelessWidget {
   final Duration remaining;
   final bool auctionEnded;
   final VoidCallback? onBidPressed;
+  final VoidCallback? onReportPressed;
   const ProductInfo({
     super.key,
     required this.product,
@@ -15,6 +16,7 @@ class ProductInfo extends StatelessWidget {
     required this.remaining,
     required this.auctionEnded,
     this.onBidPressed,
+    this.onReportPressed,
   });
   @override
   Widget build(BuildContext context) {
@@ -22,14 +24,29 @@ class ProductInfo extends StatelessWidget {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            product.name!,
-            style: const TextStyle(
-              fontFamily: "IBM Plex Sans",
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Color(0xff000000),
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  product.name!,
+                  style: const TextStyle(
+                    fontFamily: "IBM Plex Sans",
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xff000000),
+                  ),
+                ),
+              ),
+              if (onReportPressed != null)
+                GestureDetector(
+                  onTap: onReportPressed,
+                  child: const Icon(
+                    Icons.report,
+                    color: Color(0xffB5B0A8),
+                    size: 20,
+                  ),
+                ),
+            ],
           ),
 
           const SizedBox(height: 8),
@@ -111,15 +128,30 @@ class ProductInfo extends StatelessWidget {
           ),
 
           SizedBox(height: 19),
-          Text(
-            product.name!,
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 18,
-              fontFamily: 'IBM Plex Sans',
-              fontWeight: FontWeight.w700,
-              height: 0.75,
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  product.name!,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 18,
+                    fontFamily: 'IBM Plex Sans',
+                    fontWeight: FontWeight.w700,
+                    height: 0.75,
+                  ),
+                ),
+              ),
+              if (onReportPressed != null)
+                GestureDetector(
+                  onTap: onReportPressed,
+                  child: const Icon(
+                    Icons.flag_outlined,
+                    color: Color(0xffB5B0A8),
+                    size: 20,
+                  ),
+                ),
+            ],
           ),
           Container(
             width: 24,
@@ -199,18 +231,30 @@ class ProductInfo extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               spacing: 18,
               children: [
-                SizedBox(
-                  width: 280,
-                  child: Text(
-                    product.name!,
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 18,
-                      fontFamily: 'IBM Plex Sans',
-                      fontWeight: FontWeight.w700,
-                      height: 0.75,
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        product.name!,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 18,
+                          fontFamily: 'IBM Plex Sans',
+                          fontWeight: FontWeight.w700,
+                          height: 0.75,
+                        ),
+                      ),
                     ),
-                  ),
+                    if (onReportPressed != null)
+                      GestureDetector(
+                        onTap: onReportPressed,
+                        child: const Icon(
+                          Icons.flag_outlined,
+                          color: Color(0xffB5B0A8),
+                          size: 20,
+                        ),
+                      ),
+                  ],
                 ),
                 SizedBox(
                   width: 280,

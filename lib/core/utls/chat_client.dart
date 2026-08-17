@@ -8,8 +8,5 @@ StreamChatClient streamClient = StreamChatClient(
 String? currentUserId;
 
 void resetStreamClient(String apiKey) {
-  streamClient = StreamChatClient(
-    apiKey,
-    logLevel: Level.OFF,
-  );
+  streamClient = StreamChatClient(apiKey, logLevel: Level.OFF);
 }

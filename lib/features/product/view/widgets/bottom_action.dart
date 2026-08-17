@@ -282,7 +282,8 @@ Widget bottomAction({
     );
   }
 }
-  Future<void> openProductChat({
+
+Future<void> openProductChat({
   required BuildContext context,
   required ItemModel product,
 }) async {
@@ -293,9 +294,7 @@ Widget bottomAction({
     print('Item Name: ${product.name}');
     print('========================================');
 
-    print(
-      'CHAT OPEN: currentUserId from global: $currentUserId',
-    );
+    print('CHAT OPEN: currentUserId from global: $currentUserId');
 
     print(
       'CHAT OPEN: Stream currentUser: '
@@ -306,8 +305,7 @@ Widget bottomAction({
     // Get current user ID
     // --------------------------------------------------
 
-    if (currentUserId == null &&
-        streamClient.state.currentUser != null) {
+    if (currentUserId == null && streamClient.state.currentUser != null) {
       currentUserId = streamClient.state.currentUser?.id;
 
       print(
@@ -320,11 +318,9 @@ Widget bottomAction({
       print('CHAT OPEN ERROR: User is not logged in');
 
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please log in to chat'),
-          ),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Please log in to chat')));
       }
 
       return;
@@ -342,57 +338,38 @@ Widget bottomAction({
     }
 
     if (sellerId == currentUserId) {
-      print(
-        'CHAT OPEN ERROR: User trying to chat with themselves',
-      );
+      print('CHAT OPEN ERROR: User trying to chat with themselves');
 
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'You cannot chat with yourself',
-            ),
-          ),
+          const SnackBar(content: Text('You cannot chat with yourself')),
         );
       }
 
       return;
     }
 
-    print(
-      'CHAT OPEN: Current user: $currentUserId',
-    );
+    print('CHAT OPEN: Current user: $currentUserId');
 
-    print(
-      'CHAT OPEN: Seller: $sellerId',
-    );
+    print('CHAT OPEN: Seller: $sellerId');
 
     // --------------------------------------------------
     // Create deterministic channel ID
     // --------------------------------------------------
 
-    final ids = [
-      currentUserId!,
-      sellerId,
-    ]..sort();
+    final ids = [currentUserId!, sellerId]..sort();
 
-    final channelId =
-        'item-${product.id}-${ids[0]}-${ids[1]}';
+    final channelId = 'item-${product.id}-${ids[0]}-${ids[1]}';
 
-    print(
-      'CHAT OPEN: Channel ID = $channelId',
-    );
+    print('CHAT OPEN: Channel ID = $channelId');
 
     // --------------------------------------------------
     // Item name
     // --------------------------------------------------
 
-    final itemName =
-        product.name?.trim() ?? '';
+    final itemName = product.name?.trim() ?? '';
 
-    print(
-      'CHAT OPEN: Item name = "$itemName"',
-    );
+    print('CHAT OPEN: Item name = "$itemName"');
 
     // --------------------------------------------------
     // Create channel
@@ -404,20 +381,14 @@ Widget bottomAction({
 
       // IMPORTANT:
       // This is where we save the item name.
-      extraData: {
-        'item_name': itemName,
-      },
+      extraData: {'item_name': itemName},
     );
 
-    print(
-      'CHAT OPEN: Creating channel...',
-    );
+    print('CHAT OPEN: Creating channel...');
 
     await channel.create();
 
-    print(
-      'CHAT OPEN: Channel created successfully',
-    );
+    print('CHAT OPEN: Channel created successfully');
 
     // --------------------------------------------------
     // Add members
@@ -428,14 +399,9 @@ Widget bottomAction({
       '[$currentUserId, $sellerId]',
     );
 
-    await channel.addMembers([
-      currentUserId!,
-      sellerId,
-    ]);
+    await channel.addMembers([currentUserId!, sellerId]);
 
-    print(
-      'CHAT OPEN: Members added successfully',
-    );
+    print('CHAT OPEN: Members added successfully');
 
     // --------------------------------------------------
     // IMPORTANT:
@@ -449,16 +415,10 @@ Widget bottomAction({
       return;
     }
 
-    print(
-      'CHAT OPEN: Navigating to ChatDetailsPage',
-    );
-  Navigator.push(
+    print('CHAT OPEN: Navigating to ChatDetailsPage');
+    Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => ChatDetailsPage(
-          channel: channel,
-        ),
-      ),
+      MaterialPageRoute(builder: (_) => ChatDetailsPage(channel: channel)),
     );
   } catch (e, stackTrace) {
     print('========================================');
@@ -472,12 +432,8 @@ Widget bottomAction({
       return;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Failed to open chat: $e',
-        ),
-      ),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('Failed to open chat: $e')));
   }
 }

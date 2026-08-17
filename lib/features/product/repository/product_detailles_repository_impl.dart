@@ -149,4 +149,19 @@ class ProductDetaillesRepositoryImpl implements ProductDetailesRepository {
               (data as List).map((item) => BidModel.fromJson(item)).toList(),
         );
   }
+
+  @override
+  Future<Map<String, dynamic>> createReport(
+    int productId,
+    String description,
+    String reason,
+  ) async {
+    final api = ApiService();
+    final response = await api.post('reports/create/', {
+      'reported_item': productId,
+      'reason': reason,
+      'description': description,
+    });
+    return response.data as Map<String, dynamic>;
+  }
 }

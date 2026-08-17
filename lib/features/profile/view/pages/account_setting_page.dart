@@ -70,7 +70,6 @@ class AccountSettingPage extends StatelessWidget {
               });
             },
           ),
-       
         ],
       ),
     );

@@ -3,6 +3,7 @@ import 'package:dealura/features/product/models/RatingModel.dart';
 import 'package:dealura/features/product/models/auction_model.dart';
 import 'package:dealura/features/product/models/bid_model.dart';
 import 'package:dealura/features/product/models/image_model/image_model.dart';
+
 import 'package:dealura/features/product/models/request_model.dart';
 
 abstract class ProductDetailesRepository {
@@ -27,4 +28,9 @@ abstract class ProductDetailesRepository {
     String comment,
   );
   Future<List<BidModel>> getBids(int auctionId);
+  Future<Map<String, dynamic>> createReport(
+    int productId,
+    String description,
+    String reason,
+  );
 }

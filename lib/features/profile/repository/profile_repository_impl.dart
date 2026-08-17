@@ -7,6 +7,7 @@ import 'package:dealura/features/auth/model/user_model.dart';
 import 'package:dealura/features/home/model/item_model.dart';
 import 'package:dealura/features/product/models/RatingModel.dart';
 import 'package:dealura/features/product/models/bid_model.dart';
+import 'package:dealura/features/product/models/report_model.dart';
 import 'package:dealura/features/product/models/request_model.dart';
 import 'package:dealura/features/profile/model/transaction_model.dart';
 import 'package:dealura/features/profile/model/wallet_model.dart';
@@ -201,6 +202,16 @@ class ProfileRepositoryImpl implements ProfileRepository {
         .get(endpoint: 'items/my-bids/')
         .then(
           (data) => (data as List).map((e) => BidModel.fromJson(e)).toList(),
+        );
+  }
+
+  @override
+  Future<List<ReportModel>> getMyReports() async {
+    final api = ApiService();
+    return await api
+        .get(endpoint: 'reports/list/')
+        .then(
+          (data) => (data as List).map((e) => ReportModel.fromJson(e)).toList(),
         );
   }
 }

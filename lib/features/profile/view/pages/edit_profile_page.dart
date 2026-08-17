@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:dealura/core/utls/app_router.dart';
+import 'package:dealura/features/product/models/report_model.dart';
 import 'package:dealura/features/profile/repository/profile_repository_impl.dart';
 import 'package:dealura/features/profile/view/widgets/profile_button.dart';
 import 'package:dealura/features/profile/view/widgets/profile_image_bottom_sheet.dart';
@@ -96,6 +97,14 @@ class EditProfilePage extends StatelessWidget {
             ),
             onTap: () {
               AppRouter.router.push('/account_setting');
+            },
+          ),
+
+          ProfileButton(
+            text: "my reports",
+            icon: Icon(Icons.report),
+            onTap: () {
+              showMyReportsBottomSheet(context);
             },
           ),
         ],
@@ -364,4 +373,252 @@ void showEditUsernameBottomSheet(
       );
     },
   );
+}
+
+void showMyReportsBottomSheet(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: const Color(0xFFFBF8F2),
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+    ),
+    builder: (sheetContext) {
+      return SizedBox(
+        height: MediaQuery.of(context).size.height * 0.75,
+        child: Column(
+          children: [
+            const SizedBox(height: 12),
+
+            Container(
+              width: 45,
+              height: 5,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade400,
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            const Text(
+              'My reports',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 20,
+                fontFamily: 'IBM Plex Sans',
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            Expanded(
+              child: FutureBuilder<List<ReportModel>>(
+                future: ProfileRepositoryImpl().getMyReports(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: Color(0xff8B7EC8),
+                      ),
+                    );
+                  }
+
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Text(
+                        'Failed to load reports',
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontFamily: 'IBM Plex Sans',
+                        ),
+                      ),
+                    );
+                  }
+
+                  final reports = snapshot.data ?? [];
+
+                  if (reports.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'No reports yet',
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontFamily: 'IBM Plex Sans',
+                        ),
+                      ),
+                    );
+                  }
+
+                  return ListView.separated(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    itemCount: reports.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    itemBuilder: (context, index) {
+                      return _ReportItem(report: reports[index]);
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+class _ReportItem extends StatelessWidget {
+  final ReportModel report;
+
+  const _ReportItem({required this.report});
+
+  @override
+  Widget build(BuildContext context) {
+    final item = report.reportedItem;
+    final status = report.status ?? 'pending';
+
+    Color statusColor;
+    switch (status.toLowerCase()) {
+      case 'resolved':
+        statusColor = const Color(0xFF5BAB8B);
+        break;
+      case 'rejected':
+        statusColor = const Color(0xFFE8A87C);
+        break;
+      default:
+        statusColor = const Color(0xFF8B7EC8);
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: const Color(0xFFEEEBF7),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: item?.image != null && item!.image!.isNotEmpty
+                    ? Image.network(
+                        item.image!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, _, _) {
+                          return const Icon(
+                            Icons.image_not_supported,
+                            color: Color(0xFF8B7EC8),
+                          );
+                        },
+                      )
+                    : const Icon(
+                        Icons.image_not_supported,
+                        color: Color(0xFF8B7EC8),
+                      ),
+              ),
+
+              const SizedBox(width: 12),
+
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item?.name ?? 'Unknown item',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 15,
+                        fontFamily: 'IBM Plex Sans',
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+
+                    const SizedBox(height: 4),
+
+                    Text(
+                      report.reason?.split('_').map((part) => part.isEmpty ? '' : part[0].toUpperCase() + part.substring(1)).join(' ') ?? 'Unknown',
+                      style: const TextStyle(
+                        color: Color(0xFFB5B0A8),
+                        fontSize: 12,
+                        fontFamily: 'IBM Plex Sans',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: statusColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  status.capitalize(),
+                  style: TextStyle(
+                    color: statusColor,
+                    fontSize: 12,
+                    fontFamily: 'IBM Plex Sans',
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          if (report.description != null && report.description!.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Text(
+              report.description!,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: Color(0xFF8A8580),
+                fontSize: 13,
+                fontFamily: 'IBM Plex Sans',
+              ),
+            ),
+          ],
+
+          const SizedBox(height: 8),
+
+          Text(
+            report.createdAt != null
+                ? '${report.createdAt!.day}/${report.createdAt!.month}/${report.createdAt!.year}'
+                : 'Unknown date',
+            style: const TextStyle(
+              color: Color(0xFFB5B0A8),
+              fontSize: 11,
+              fontFamily: 'IBM Plex Sans',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+extension StringExtension on String {
+  String capitalize() {
+    if (isEmpty) return this;
+    return "${this[0].toUpperCase()}${substring(1)}";
+  }
 }

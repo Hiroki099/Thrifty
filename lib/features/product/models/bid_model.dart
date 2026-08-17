@@ -50,6 +50,4 @@ class BidModel {
           : DateTime.parse(json['bid_date'] as String),
     );
   }
-
-
 }

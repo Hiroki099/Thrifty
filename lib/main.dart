@@ -12,7 +12,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
-ValueNotifier<StreamChatClient> streamClientNotifier = ValueNotifier(streamClient);
+
+ValueNotifier<StreamChatClient> streamClientNotifier = ValueNotifier(
+  streamClient,
+);
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

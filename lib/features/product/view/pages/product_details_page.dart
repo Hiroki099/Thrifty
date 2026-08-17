@@ -50,6 +50,53 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     await rateProduct(rating, comment);
   }
 
+  Future<void> showReportDialog(ItemModel product) async {
+    final result = await showModalBottomSheet<Map<String, dynamic>>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: const Color(0xffFBF8F2),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (_) {
+        return _ReportBottomSheet(productId: product.id!);
+      },
+    );
+
+    if (result == null || !mounted) return;
+
+    final reason = result['reason'] as String;
+    final description = result['description'] as String;
+
+    await submitReport(product.id!, reason, description);
+  }
+
+  Future<void> submitReport(
+    int productId,
+    String reason,
+    String description,
+  ) async {
+    try {
+      final repo = ProductDetaillesRepositoryImpl();
+     await repo.createReport(productId, description, reason);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Report submitted successfully'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to submit report: $e')));
+    }
+  }
+
   Future<void> showBids(AuctionModel auction) async {
     if (auction.id == null) return;
 
@@ -733,6 +780,11 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                               onBidPressed: () async {
                                 await showBids(auction!);
                               },
+                              onReportPressed: !isMyProduct
+                                  ? () async {
+                                      await showReportDialog(product);
+                                    }
+                                  : null,
                             ),
                             const SizedBox(height: 18),
 
@@ -1111,5 +1163,211 @@ class _BidItem extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class _ReportBottomSheet extends StatefulWidget {
+  final int productId;
+
+  const _ReportBottomSheet({required this.productId});
+
+  @override
+  State<_ReportBottomSheet> createState() => _ReportBottomSheetState();
+}
+
+class _ReportBottomSheetState extends State<_ReportBottomSheet> {
+  String selectedReason = 'harassment';
+  final descriptionController = TextEditingController();
+  final List<String> reasons = [
+    'harassment',
+    'spam',
+    'fraud',
+    'inappropriate_content',
+    'other',
+  ];
+
+  @override
+  void dispose() {
+    descriptionController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 20,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Report item',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 20,
+                      fontFamily: 'IBM Plex Sans',
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 20),
+
+              const Text(
+                'Reason',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 16,
+                  fontFamily: 'IBM Plex Sans',
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: reasons.map((reason) {
+                  final isSelected = selectedReason == reason;
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedReason = reason;
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? const Color(0xffE8A87C)
+                            : Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: isSelected
+                              ? const Color(0xffE8A87C)
+                              : const Color(0xffE5E0D9),
+                        ),
+                      ),
+                      child: Text(
+                        reason
+                            .split('_')
+                            .map(
+                              (part) => part.isEmpty
+                                  ? ''
+                                  : part[0].toUpperCase() + part.substring(1),
+                            )
+                            .join(' '),
+                        style: TextStyle(
+                          color: isSelected ? Colors.white : Colors.black,
+                          fontSize: 14,
+                          fontFamily: 'IBM Plex Sans',
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+
+              const SizedBox(height: 20),
+
+              const Text(
+                'Description',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 16,
+                  fontFamily: 'IBM Plex Sans',
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              TextField(
+                controller: descriptionController,
+                maxLines: 4,
+                decoration: InputDecoration(
+                  hintText: 'Describe the issue...',
+                  hintStyle: TextStyle(
+                    color: Colors.grey.shade400,
+                    fontFamily: 'IBM Plex Sans',
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey.shade300),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey.shade300),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Color(0xffE8A87C)),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context, {
+                      'reason': selectedReason,
+                      'description': descriptionController.text.trim(),
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xffE8A87C),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    'Submit report',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontFamily: 'IBM Plex Sans',
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+extension StringExtension on String {
+  String capitalize() {
+    if (isEmpty) return this;
+    return "${this[0].toUpperCase()}${substring(1)}";
   }
 }

@@ -4,6 +4,7 @@ import 'package:dealura/features/auth/model/user_model.dart';
 import 'package:dealura/features/home/model/item_model.dart';
 import 'package:dealura/features/product/models/RatingModel.dart';
 import 'package:dealura/features/product/models/bid_model.dart';
+import 'package:dealura/features/product/models/report_model.dart';
 import 'package:dealura/features/product/models/request_model.dart';
 import 'package:dealura/features/profile/model/transaction_model.dart';
 import 'package:dealura/features/profile/model/wallet_model.dart';
@@ -31,4 +32,5 @@ abstract class ProfileRepository {
   Future<void> editRate(int? rateId, String? newComment, int? newRating);
   Future<void> deleteRate(int? rateId);
   Future<List<BidModel>> getMyBids();
+  Future<List<ReportModel>> getMyReports();
 }

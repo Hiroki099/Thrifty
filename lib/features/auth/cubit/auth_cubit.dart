@@ -109,7 +109,7 @@ class AuthCubit extends Cubit<AuthState> {
 
           streamClient = StreamChatClient(chat.apiKey!, logLevel: Level.OFF);
 
-           streamClientNotifier.value = streamClient; 
+          streamClientNotifier.value = streamClient;
           debugPrint('AUTH: Stream client created');
 
           debugPrint(

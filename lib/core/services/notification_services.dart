@@ -533,14 +533,13 @@ class NotificationService {
 
   Timer? _keepAliveTimer;
 
-  
   static String? _activeChannelId;
-  
+
   static void setActiveChannel(String? channelId) {
     _activeChannelId = channelId;
     debugPrint('STREAM: Active channel set to: $channelId');
   }
-  
+
   static void clearActiveChannel() {
     debugPrint('STREAM: Active channel cleared');
     _activeChannelId = null;
@@ -625,19 +624,18 @@ class NotificationService {
     );
   }
 
-  
   bool _isUserInActiveChannel(String? channelId) {
     if (channelId == null || _activeChannelId == null) {
       return false;
     }
-    
+
     // Check if the incoming message is from the currently active channel
     final isActive = channelId == _activeChannelId;
-    
+
     if (isActive) {
       debugPrint('STREAM: Message from active channel, skipping notification');
     }
-    
+
     return isActive;
   }
 
@@ -781,28 +779,27 @@ class NotificationService {
     _initialized = false;
   }
 
-
   Future<void> disconnectStream() async {
-  try {
-    debugPrint('STREAM: Disconnecting user...');
+    try {
+      debugPrint('STREAM: Disconnecting user...');
 
-    stopStreamListener();
+      stopStreamListener();
 
-    _keepAliveTimer?.cancel();
-    _keepAliveTimer = null;
+      _keepAliveTimer?.cancel();
+      _keepAliveTimer = null;
 
-    if (streamClient.state.currentUser != null) {
-      await streamClient.disconnectUser();
+      if (streamClient.state.currentUser != null) {
+        await streamClient.disconnectUser();
+      }
+
+      currentUserId = null;
+
+      debugPrint('STREAM: User disconnected successfully');
+    } catch (e, stackTrace) {
+      debugPrint('STREAM: Disconnect failed: $e');
+      debugPrint('$stackTrace');
+    } finally {
+      _streamListenerStarted = false;
     }
-
-    currentUserId = null;
-
-    debugPrint('STREAM: User disconnected successfully');
-  } catch (e, stackTrace) {
-    debugPrint('STREAM: Disconnect failed: $e');
-    debugPrint('$stackTrace');
-  } finally {
-    _streamListenerStarted = false;
   }
-}
 }

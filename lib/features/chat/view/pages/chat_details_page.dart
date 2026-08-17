@@ -1,4 +1,4 @@
-  import 'package:dealura/core/services/notification_services.dart';
+import 'package:dealura/core/services/notification_services.dart';
 import 'package:dealura/core/utls/chat_client.dart';
 import 'package:flutter/material.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
@@ -6,24 +6,18 @@ import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 class ChatDetailsPage extends StatefulWidget {
   final Channel channel;
 
-  const ChatDetailsPage({
-    super.key,
-    required this.channel,
-  });
+  const ChatDetailsPage({super.key, required this.channel});
 
   @override
-  State<ChatDetailsPage> createState() =>
-      _ChatDetailsPageState();
+  State<ChatDetailsPage> createState() => _ChatDetailsPageState();
 }
 
-class _ChatDetailsPageState
-    extends State<ChatDetailsPage> {
+class _ChatDetailsPageState extends State<ChatDetailsPage> {
   bool _isLoading = true;
   String? _errorMessage;
 
   String? get itemName {
-    final value =
-        widget.channel.extraData['item_name'];
+    final value = widget.channel.extraData['item_name'];
 
     if (value == null) {
       return null;
@@ -44,22 +38,14 @@ class _ChatDetailsPageState
 
     debugPrint('========================================');
     debugPrint('CHAT DETAILS INIT');
-    debugPrint(
-      'Channel ID: ${widget.channel.id}',
-    );
-    debugPrint(
-      'Channel CID: ${widget.channel.cid}',
-    );
-    debugPrint(
-      'Channel type: ${widget.channel.type}',
-    );
+    debugPrint('Channel ID: ${widget.channel.id}');
+    debugPrint('Channel CID: ${widget.channel.cid}');
+    debugPrint('Channel type: ${widget.channel.type}');
     debugPrint(
       'Current user: '
       '${streamClient.state.currentUser?.id}',
     );
-    debugPrint(
-      'Item name: $itemName',
-    );
+    debugPrint('Item name: $itemName');
     debugPrint(
       'Extra data: '
       '${widget.channel.extraData}',
@@ -75,13 +61,10 @@ class _ChatDetailsPageState
       // Check Stream user
       // --------------------------------------------------
 
-      final currentUser =
-          streamClient.state.currentUser;
+      final currentUser = streamClient.state.currentUser;
 
       if (currentUser == null) {
-        throw Exception(
-          'Stream user is not connected.',
-        );
+        throw Exception('Stream user is not connected.');
       }
 
       debugPrint(
@@ -96,14 +79,10 @@ class _ChatDetailsPageState
       final cid = widget.channel.cid;
 
       if (cid == null || cid.isEmpty) {
-        throw Exception(
-          'Channel CID is null or empty.',
-        );
+        throw Exception('Channel CID is null or empty.');
       }
 
-      debugPrint(
-        'CHAT DETAILS: Preparing channel $cid',
-      );
+      debugPrint('CHAT DETAILS: Preparing channel $cid');
 
       // --------------------------------------------------
       // Notification active channel
@@ -116,41 +95,28 @@ class _ChatDetailsPageState
       // --------------------------------------------------
 
       if (widget.channel.state == null) {
-        debugPrint(
-          'CHAT DETAILS: Channel state is null.',
-        );
+        debugPrint('CHAT DETAILS: Channel state is null.');
 
-        debugPrint(
-          'CHAT DETAILS: Watching channel...',
-        );
+        debugPrint('CHAT DETAILS: Watching channel...');
 
         await widget.channel.watch();
 
-        debugPrint(
-          'CHAT DETAILS: Channel watch completed.',
-        );
+        debugPrint('CHAT DETAILS: Channel watch completed.');
       } else {
-        debugPrint(
-          'CHAT DETAILS: Channel state already available.',
-        );
+        debugPrint('CHAT DETAILS: Channel state already available.');
       }
 
       // --------------------------------------------------
       // Make sure state exists
       // --------------------------------------------------
 
-      final channelState =
-          widget.channel.state;
+      final channelState = widget.channel.state;
 
       if (channelState == null) {
-        throw Exception(
-          'Unable to load channel state.',
-        );
+        throw Exception('Unable to load channel state.');
       }
 
-      debugPrint(
-        'CHAT DETAILS: Channel state available.',
-      );
+      debugPrint('CHAT DETAILS: Channel state available.');
 
       debugPrint(
         'CHAT DETAILS: Members = '
@@ -165,8 +131,7 @@ class _ChatDetailsPageState
       // --------------------------------------------------
       // Debug members
       // --------------------------------------------------
-  for (final member
-          in channelState.members) {
+      for (final member in channelState.members) {
         debugPrint(
           'Member: '
           '${member.user?.id} / '
@@ -178,8 +143,7 @@ class _ChatDetailsPageState
       // Debug messages
       // --------------------------------------------------
 
-      for (final message
-          in channelState.messages) {
+      for (final message in channelState.messages) {
         debugPrint(
           'Message: '
           '${message.id} / '
@@ -211,9 +175,7 @@ class _ChatDetailsPageState
         _errorMessage = null;
       });
 
-      debugPrint(
-        'CHAT DETAILS: Initialization completed.',
-      );
+      debugPrint('CHAT DETAILS: Initialization completed.');
     } catch (e, stackTrace) {
       debugPrint('========================================');
       debugPrint('CHAT DETAILS ERROR');
@@ -248,9 +210,7 @@ class _ChatDetailsPageState
 
   @override
   void dispose() {
-    debugPrint(
-      'CHAT DETAILS DISPOSE: Clearing active channel',
-    );
+    debugPrint('CHAT DETAILS DISPOSE: Clearing active channel');
 
     NotificationService.clearActiveChannel();
 
@@ -259,20 +219,16 @@ class _ChatDetailsPageState
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth =
-        MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.of(context).size.width;
 
-    final isTablet =
-        screenWidth > 600;
+    final isTablet = screenWidth > 600;
 
     // --------------------------------------------------
     // Invalid channel
     // --------------------------------------------------
 
     if (widget.channel.id == null) {
-      return _buildErrorScreen(
-        'Channel not available.',
-      );
+      return _buildErrorScreen('Channel not available.');
     }
 
     // --------------------------------------------------
@@ -281,14 +237,8 @@ class _ChatDetailsPageState
 
     if (_isLoading) {
       return Scaffold(
-        backgroundColor:
-            const Color(0xFFFBF8F2),
-        body: const SafeArea(
-          child: Center(
-            child:
-                CircularProgressIndicator(),
-          ),
-        ),
+        backgroundColor: const Color(0xFFFBF8F2),
+        body: const SafeArea(child: Center(child: CircularProgressIndicator())),
       );
     }
 
@@ -297,10 +247,7 @@ class _ChatDetailsPageState
     // --------------------------------------------------
 
     if (_errorMessage != null) {
-      return _buildErrorScreen(
-        _errorMessage!,
-        showRetry: true,
-      );
+      return _buildErrorScreen(_errorMessage!, showRetry: true);
     }
 
     // --------------------------------------------------
@@ -321,37 +268,31 @@ class _ChatDetailsPageState
     return StreamChannel(
       channel: widget.channel,
       child: Scaffold(
-        backgroundColor:
-            const Color(0xFFFBF8F2),
+        backgroundColor: const Color(0xFFFBF8F2),
         body: SafeArea(
           child: Column(
             children: [
               // ------------------------------------------------
               // Header
               // ------------------------------------------------
-
               const StreamChannelHeader(),
 
               // ------------------------------------------------
               // Messages
               // ------------------------------------------------
-  Expanded(
+              Expanded(
                 child: Padding(
                   padding: EdgeInsets.symmetric(
-                    horizontal:
-                        isTablet ? 24.0 : 16.0,
-                    vertical:
-                        isTablet ? 16.0 : 8.0,
+                    horizontal: isTablet ? 24.0 : 16.0,
+                    vertical: isTablet ? 16.0 : 8.0,
                   ),
-                  child:
-                      const StreamMessageListView(),
+                  child: const StreamMessageListView(),
                 ),
               ),
 
               // ------------------------------------------------
               // Composer
               // ------------------------------------------------
-
               Padding(
                 padding: EdgeInsets.only(
                   left: isTablet ? 24.0 : 16.0,
@@ -359,8 +300,7 @@ class _ChatDetailsPageState
                   top: 8.0,
                   bottom: isTablet ? 16.0 : 8.0,
                 ),
-                child:
-                     StreamMessageComposer(),
+                child: StreamMessageComposer(),
               ),
             ],
           ),
@@ -369,21 +309,15 @@ class _ChatDetailsPageState
     );
   }
 
-  Widget _buildErrorScreen(
-    String message, {
-    bool showRetry = false,
-  }) {
+  Widget _buildErrorScreen(String message, {bool showRetry = false}) {
     return Scaffold(
-      backgroundColor:
-          const Color(0xFFFBF8F2),
+      backgroundColor: const Color(0xFFFBF8F2),
       body: SafeArea(
         child: Center(
           child: Padding(
-            padding:
-                const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(24),
             child: Column(
-              mainAxisSize:
-                  MainAxisSize.min,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 const Icon(
                   Icons.chat_bubble_outline,
@@ -395,25 +329,16 @@ class _ChatDetailsPageState
 
                 const Text(
                   'Unable to open chat',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight:
-                        FontWeight.w600,
-                  ),
-                  textAlign:
-                      TextAlign.center,
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+                  textAlign: TextAlign.center,
                 ),
 
                 const SizedBox(height: 10),
 
                 Text(
                   message,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey,
-                  ),
-                  textAlign:
-                      TextAlign.center,
+                  style: const TextStyle(fontSize: 14, color: Colors.grey),
+                  textAlign: TextAlign.center,
                 ),
 
                 if (showRetry) ...[
@@ -421,9 +346,7 @@ class _ChatDetailsPageState
 
                   ElevatedButton(
                     onPressed: _retry,
-                    child: const Text(
-                      'Try Again',
-                    ),
+                    child: const Text('Try Again'),
                   ),
                 ],
               ],
